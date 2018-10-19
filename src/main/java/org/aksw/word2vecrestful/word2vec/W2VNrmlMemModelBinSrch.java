@@ -48,7 +48,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 		// process();
 	}
 	
-	public W2VNrmlMemModelBinSrch(final Map<String, float[]> word2vec, final int vectorSize, int compareVecCount) throws IOException {
+	public W2VNrmlMemModelBinSrch(final Map<String, float[]> word2vec, final int vectorSize, int compareVecCount, int bucketCount) throws IOException {
 		this.compareVecCount = compareVecCount;
 		this.word2vec = word2vec;
 		this.vectorSize = vectorSize;
