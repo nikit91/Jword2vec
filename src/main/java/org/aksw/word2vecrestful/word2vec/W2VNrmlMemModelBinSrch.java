@@ -95,9 +95,19 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 		}
 	}
 
+	/*
+	 * protected int getBucketIndex(double cosineSimVal) { Double dIndx =
+	 * ((bucketCount - 1d) / 2d) * (cosineSimVal + 1d); return
+	 * Math.round(dIndx.floatValue()); }
+	 */
+
 	protected int getBucketIndex(double cosineSimVal) {
-		Double dIndx = ((bucketCount - 1d) / 2d) * (cosineSimVal + 1d);
-		return Math.round(dIndx.floatValue());
+		double bucketSize = 2.0 / bucketCount;
+		int index = (int) Math.round((cosineSimVal + 1.0) / (bucketSize));
+		if (index == bucketCount) {
+			--index;
+		}
+		return index;
 	}
 
 	private void processCosineSim() {
