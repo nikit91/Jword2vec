@@ -51,7 +51,7 @@ public class W2VNrmlMemModelKMeans extends W2VNrmlMemModelBinSrch {
 		LOG.info("Process from KMeans called");
 		fetchComparisonVectors();
 		// Initialize Arrays
-		processCosineSim();
+		genAllCosineSim();
 	}
 
 	private void fetchComparisonVectors() throws IOException {
@@ -91,25 +91,6 @@ public class W2VNrmlMemModelKMeans extends W2VNrmlMemModelBinSrch {
 
 	public static ClusterableVec getClusterablePoint(float[] vec) {
 		return new ClusterableVec(vec);
-	}
-
-	private void processCosineSim() {
-		double cosSimVal;
-		this.wordArr = new String[word2vec.size()];
-		this.vecArr = new float[word2vec.size()][vectorSize];
-		int i = 0;
-		for (String word : word2vec.keySet()) {
-			wordArr[i] = word;
-			float[] vec = word2vec.get(word);
-			vecArr[i] = vec;
-			for (int j = 0; j < compareVecCount; j++) {
-				BitSet[] comparisonVecBuckets = csBucketContainer[j];
-				cosSimVal = Word2VecMath.cosineSimilarityNormalizedVecs(comparisonVecs[j], vec);
-				// Setting bitset for the comparison vec
-				setValToBucket(i, cosSimVal, comparisonVecBuckets);
-			}
-			i++;
-		}
 	}
 
 	public static float[][] readVecsFromFile(File inputFile) throws IOException {

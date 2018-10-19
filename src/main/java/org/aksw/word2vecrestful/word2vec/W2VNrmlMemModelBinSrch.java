@@ -48,6 +48,14 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 		// process();
 	}
 	
+	public W2VNrmlMemModelBinSrch(final Map<String, float[]> word2vec, final int vectorSize, int compareVecCount) throws IOException {
+		this.compareVecCount = compareVecCount;
+		this.word2vec = word2vec;
+		this.vectorSize = vectorSize;
+		initVars();
+		// process();
+	}
+	
 	public void initVars() {
 		comparisonVecs = new float[compareVecCount][vectorSize];
 		csBucketContainer = new BitSet[compareVecCount][bucketCount];
@@ -263,6 +271,25 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 				return -1;
 		}
 		return dist;
+	}
+	
+	protected void genAllCosineSim() {
+		double cosSimVal;
+		this.wordArr = new String[word2vec.size()];
+		this.vecArr = new float[word2vec.size()][vectorSize];
+		int i = 0;
+		for (String word : word2vec.keySet()) {
+			wordArr[i] = word;
+			float[] vec = word2vec.get(word);
+			vecArr[i] = vec;
+			for (int j = 0; j < compareVecCount; j++) {
+				BitSet[] comparisonVecBuckets = csBucketContainer[j];
+				cosSimVal = Word2VecMath.cosineSimilarityNormalizedVecs(comparisonVecs[j], vec);
+				// Setting bitset for the comparison vec
+				setValToBucket(i, cosSimVal, comparisonVecBuckets);
+			}
+			i++;
+		}
 	}
 
 	/**
