@@ -47,15 +47,17 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 		initVars();
 		// process();
 	}
-	
-	public W2VNrmlMemModelBinSrch(final Map<String, float[]> word2vec, final int vectorSize, int compareVecCount, int bucketCount) throws IOException {
+
+	public W2VNrmlMemModelBinSrch(final Map<String, float[]> word2vec, final int vectorSize, int compareVecCount,
+			int bucketCount) throws IOException {
+		this.bucketCount = bucketCount;
 		this.compareVecCount = compareVecCount;
 		this.word2vec = word2vec;
 		this.vectorSize = vectorSize;
 		initVars();
 		// process();
 	}
-	
+
 	public void initVars() {
 		comparisonVecs = new float[compareVecCount][vectorSize];
 		csBucketContainer = new BitSet[compareVecCount][bucketCount];
@@ -272,7 +274,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 		}
 		return dist;
 	}
-	
+
 	protected void genAllCosineSim() {
 		double cosSimVal;
 		this.wordArr = new String[word2vec.size()];
