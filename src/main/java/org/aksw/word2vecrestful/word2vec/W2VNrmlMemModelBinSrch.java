@@ -219,7 +219,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 				}
 			}
 			int nearbyWordsCount = finBitSet.cardinality();
-			// LOG.info("Number of nearby words: " + nearbyWordsCount);
+			LOG.info("Number of nearby words: " + nearbyWordsCount);
 			int[] nearbyIndexes = new int[nearbyWordsCount];
 			int j = 0;
 			for (int i = finBitSet.nextSetBit(0); i >= 0; i = finBitSet.nextSetBit(i + 1), j++) {
@@ -234,7 +234,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 			LOG.error("Exception has occured while finding closest word.");
 			e.printStackTrace();
 		}
-		// LOG.info("Closest word found is: " + closestWord);
+		LOG.info("Closest word found is: " + closestWord);
 		return closestWord;
 	}
 
