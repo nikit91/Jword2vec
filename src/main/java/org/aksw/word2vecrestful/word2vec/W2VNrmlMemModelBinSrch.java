@@ -214,14 +214,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 				if (csBucketContainer[i][indx] != null) {
 					curBs.or(csBucketContainer[i][indx]);
 				}
-				int temIndx = indx + 1;
-				if (temIndx < csBucketContainer[i].length && csBucketContainer[i][temIndx] != null) {
-					curBs.or(csBucketContainer[i][temIndx]);
-				}
-				temIndx = indx - 1;
-				if (temIndx > -1 && csBucketContainer[i][temIndx] != null) {
-					curBs.or(csBucketContainer[i][temIndx]);
-				}
+				orWithNonNullNeighbour(indx, i, curBs);
 				if (i == 0) {
 					finBitSet = curBs;
 				} else {
@@ -246,6 +239,44 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 		}
 		LOG.info("Closest word found is: " + closestWord);
 		return closestWord;
+	}
+
+	protected void orWithNonNullNeighbour(int bIndx, int vecIndx, BitSet curBs) {
+		boolean wordsFound = false;
+		int rNbr = bIndx + 1;
+		int lNbr = bIndx - 1;
+		int rLim = csBucketContainer[vecIndx].length;
+		int lLim = 0;
+		BitSet temp;
+		while (true) {
+			if (rNbr < rLim) {
+				temp = csBucketContainer[vecIndx][rNbr];
+				if (orOperation(temp, curBs)) {
+					wordsFound = true;
+				}
+			}
+			if (lNbr >= lLim) {
+				temp = csBucketContainer[vecIndx][lNbr];
+				if (orOperation(temp, curBs)) {
+					wordsFound = true;
+				}
+			}
+			rNbr++;
+			lNbr--;
+			if(wordsFound) {
+				break;
+			} else if(rNbr >= rLim && lNbr < lLim) {
+				break;
+			}
+		}
+	}
+
+	private boolean orOperation(BitSet temp, BitSet curBs) {
+		if (temp == null) {
+			return false;
+		}
+		curBs.or(temp);
+		return true;
 	}
 
 	protected String findClosestWord(int[] nearbyIndexes, float[] vector) {
