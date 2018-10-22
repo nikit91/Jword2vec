@@ -22,7 +22,7 @@ public class ModelReducer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ModelReducer.class);
 
     public static final int REDUCED_WORDS = 100000;
-    public static final String OUPUT_FILE = "reducedModel-" + REDUCED_WORDS + "-normalized.bin";
+    public static final String OUPUT_FILE = "data/reducedModel-" + REDUCED_WORDS + "-normalized.bin";
 
     public static void main(String[] args) throws IOException {
         LOGGER.info("Reading model...");

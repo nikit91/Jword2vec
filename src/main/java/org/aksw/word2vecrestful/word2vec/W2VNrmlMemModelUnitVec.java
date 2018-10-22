@@ -25,7 +25,7 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 	public static Logger LOG = LogManager.getLogger(GenWord2VecModel.class);
 
 	public W2VNrmlMemModelUnitVec(final Map<String, float[]> word2vec, final int vectorSize) throws IOException {
-		super(word2vec, vectorSize, vectorSize, 100);
+		super(word2vec, vectorSize, vectorSize, 15);
 	}
 
 	@Override
