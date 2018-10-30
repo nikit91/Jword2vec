@@ -215,6 +215,9 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 					curBs.or(csBucketContainer[i][indx]);
 				}
 				orWithNonNullNeighbour(indx, i, curBs);
+				if(!curBs.get(33296)) {
+					System.out.println(i);
+				}
 				if (i == 0) {
 					finBitSet = curBs;
 				} else {
