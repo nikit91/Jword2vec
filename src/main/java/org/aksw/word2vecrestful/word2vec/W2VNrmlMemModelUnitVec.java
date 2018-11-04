@@ -1,8 +1,10 @@
 package org.aksw.word2vecrestful.word2vec;
 
 import java.io.IOException;
+import java.util.BitSet;
 import java.util.Map;
 
+import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -35,14 +37,108 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 		// Initialize Arrays
 		genAllCosineSim();
 	}
-	
+
 	private void generateComparisonVecs() {
-		for(int i=0;i<vectorSize;i++) {
+		for (int i = 0; i < vectorSize; i++) {
 			float[] compareVec = new float[vectorSize];
 			compareVec[i] = 1;
 			comparisonVecs[i] = compareVec;
 		}
 	}
-	
+
+	/**
+	 * Method to fetch the closest word entry for a given vector using cosine
+	 * similarity
+	 * 
+	 * @param vector - vector to find closest word to
+	 * @param subKey - key to subset if any
+	 * @return closest word to the given vector alongwith it's vector
+	 */
+	protected String getClosestEntry(float[] vector, String subKey) {
+		String closestWord = null;
+		try {
+			// Normalize incoming vector
+			vector = Word2VecMath.normalize(vector);
+			boolean wordNotFound = true;
+			boolean midEmpty;
+			int ringRad = -1;
+			BitSet midBs;
+			while (wordNotFound) {
+				midEmpty = false;
+				ringRad++;
+				// calculate cosine similarity of all distances
+				float[] curCompVec;
+				midBs = new BitSet(word2vec.size());
+				BitSet finBitSet = null;
+				for (int i = 0; i < compareVecCount; i++) {
+					curCompVec = comparisonVecs[i];
+					double cosSimVal = Word2VecMath.cosineSimilarityNormalizedVecs(curCompVec, vector);
+					int indx = getBucketIndex(cosSimVal);
+					BitSet curBs = new BitSet(word2vec.size());
+					// calculate middle bitset
+					orWithNeighbours(indx, ringRad, 0, csBucketContainer[i], curBs);
+					if (i == 0) {
+						midBs.or(curBs);
+						finBitSet = curBs;
+					} else {
+						midBs.and(curBs);
+					}
+					if (midBs.cardinality() == 0) {
+						midEmpty = true;
+						break;
+					}
+					orWithNeighbours(indx, 1, ringRad, csBucketContainer[i], curBs);
+					if (i > 0) {
+						finBitSet.and(curBs);
+					}
+				}
+				if (!midEmpty) {
+					int nearbyWordsCount = finBitSet.cardinality();
+					LOG.info("Number of nearby words: " + nearbyWordsCount);
+					int[] nearbyIndexes = new int[nearbyWordsCount];
+					int j = 0;
+					for (int i = finBitSet.nextSetBit(0); i >= 0; i = finBitSet.nextSetBit(i + 1), j++) {
+						// operate on index i here
+						nearbyIndexes[j] = i;
+						if (i == Integer.MAX_VALUE) {
+							break; // or (i+1) would overflow
+						}
+					}
+					closestWord = findClosestWord(nearbyIndexes, vector);
+					wordNotFound = false;
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOG.error("Exception has occured while finding closest word.");
+			e.printStackTrace();
+		}
+		LOG.info("Closest word found is: " + closestWord);
+		return closestWord;
+	}
+
+	protected void orWithNeighbours(int bIndx, int range, int offset, BitSet[] bucketArr, BitSet curBs) {
+		int rNbr = bIndx + offset + 1;
+		int lNbr = bIndx - offset - 1;
+		int contLen = bucketArr.length;
+		int rRangeAdd = rNbr + range;
+		int rLim = rRangeAdd > contLen ? contLen : rRangeAdd; // exclusive
+		int lRangeSub = lNbr - range - 1;
+		int lLim = lRangeSub < 0 ? 0 : lRangeSub; // inclusive
+		BitSet temp;
+		while (true) {
+			if (rNbr < rLim) {
+				temp = bucketArr[rNbr];
+				orOperation(temp, curBs);
+			}
+			if (lNbr >= lLim) {
+				temp = bucketArr[lNbr];
+				orOperation(temp, curBs);
+			}
+			rNbr++;
+			lNbr--;
+		}
+	}
 
 }
