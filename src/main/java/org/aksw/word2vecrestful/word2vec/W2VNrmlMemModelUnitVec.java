@@ -27,7 +27,7 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 	public static Logger LOG = LogManager.getLogger(GenWord2VecModel.class);
 
 	public W2VNrmlMemModelUnitVec(final Map<String, float[]> word2vec, final int vectorSize) throws IOException {
-		super(word2vec, vectorSize, vectorSize, 15);
+		super(word2vec, vectorSize, vectorSize, 20);
 	}
 
 	@Override
@@ -76,7 +76,10 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 					int indx = getBucketIndex(cosSimVal);
 					BitSet curBs = new BitSet(word2vec.size());
 					// calculate middle bitset
-					orWithNeighbours(indx, ringRad, 0, csBucketContainer[i], curBs);
+					curBs.or(csBucketContainer[i][indx]);
+					if (ringRad > 0) {
+						orWithNeighbours(indx, ringRad, 0, csBucketContainer[i], curBs);
+					}
 					if (i == 0) {
 						midBs.or(curBs);
 						finBitSet = curBs;
@@ -117,13 +120,17 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 		LOG.info("Closest word found is: " + closestWord);
 		return closestWord;
 	}
+
 	/**
-	 * Method to or with all the bitsets in a given range of a bucket from a given offset
-	 * @param bIndx - index of the bucket in bucket array
-	 * @param range - range of buckets to or with including both left and right sides
-	 * @param offset - offset of buckets , 0 if none
+	 * Method to or with all the bitsets in a given range of a bucket from a given
+	 * offset
+	 * 
+	 * @param bIndx     - index of the bucket in bucket array
+	 * @param range     - range of buckets to or with including both left and right
+	 *                  sides
+	 * @param offset    - offset of buckets , 0 if none
 	 * @param bucketArr - array of buckets
-	 * @param curBs - bitset to perform or operation on
+	 * @param curBs     - bitset to perform or operation on
 	 */
 	protected void orWithNeighbours(int bIndx, int range, int offset, BitSet[] bucketArr, BitSet curBs) {
 		int rNbr = bIndx + offset + 1;
@@ -145,6 +152,9 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 			}
 			rNbr++;
 			lNbr--;
+			if (rNbr >= rLim && lNbr < lLim) {
+				break;
+			}
 		}
 	}
 
