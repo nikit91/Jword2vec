@@ -117,7 +117,14 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 		LOG.info("Closest word found is: " + closestWord);
 		return closestWord;
 	}
-
+	/**
+	 * Method to or with all the bitsets in a given range of a bucket from a given offset
+	 * @param bIndx - index of the bucket in bucket array
+	 * @param range - range of buckets to or with including both left and right sides
+	 * @param offset - offset of buckets , 0 if none
+	 * @param bucketArr - array of buckets
+	 * @param curBs - bitset to perform or operation on
+	 */
 	protected void orWithNeighbours(int bIndx, int range, int offset, BitSet[] bucketArr, BitSet curBs) {
 		int rNbr = bIndx + offset + 1;
 		int lNbr = bIndx - offset - 1;
