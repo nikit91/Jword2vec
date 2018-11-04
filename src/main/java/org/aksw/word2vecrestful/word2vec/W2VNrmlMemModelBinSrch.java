@@ -95,20 +95,19 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 		}
 	}
 
-	/*
-	 * protected int getBucketIndex(double cosineSimVal) { Double dIndx =
-	 * ((bucketCount - 1d) / 2d) * (cosineSimVal + 1d); return
-	 * Math.round(dIndx.floatValue()); }
-	 */
-
 	protected int getBucketIndex(double cosineSimVal) {
-		double bucketSize = 2.0 / bucketCount;
-		int index = (int) Math.round((cosineSimVal + 1.0) / (bucketSize));
-		if (index == bucketCount) {
-			--index;
-		}
-		return index;
+		Double dIndx = ((bucketCount - 1d) / 2d) * (cosineSimVal + 1d);
+		return Math.round(dIndx.floatValue());
 	}
+
+//	protected int getBucketIndex(double cosineSimVal) {
+//		double bucketSize = 2.0 / bucketCount;
+//		int index = (int) Math.round((cosineSimVal + 1.0) / (bucketSize));
+//		if (index == bucketCount) {
+//			--index;
+//		}
+//		return index;
+//	}
 
 	private void processCosineSim() {
 		this.wordArr = new String[word2vec.size()];
@@ -163,8 +162,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	 * Method to fetch the closest word entry for a given vector using cosine
 	 * similarity
 	 * 
-	 * @param vector
-	 *            - vector to find closest word to
+	 * @param vector - vector to find closest word to
 	 * 
 	 * @return closest word to the given vector alongwith it's vector
 	 */
@@ -177,10 +175,8 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	 * Method to fetch the closest word entry for a given vector using cosine
 	 * similarity
 	 * 
-	 * @param vector
-	 *            - vector to find closest word to
-	 * @param subKey
-	 *            - key to subset if any
+	 * @param vector - vector to find closest word to
+	 * @param subKey - key to subset if any
 	 * @return closest word to the given vector alongwith it's vector
 	 */
 	@Override
@@ -192,10 +188,8 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	 * Method to fetch the closest word entry for a given vector using cosine
 	 * similarity
 	 * 
-	 * @param vector
-	 *            - vector to find closest word to
-	 * @param subKey
-	 *            - key to subset if any
+	 * @param vector - vector to find closest word to
+	 * @param subKey - key to subset if any
 	 * @return closest word to the given vector alongwith it's vector
 	 */
 	protected String getClosestEntry(float[] vector, String subKey) {
@@ -215,7 +209,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 					curBs.or(csBucketContainer[i][indx]);
 				}
 				orWithNonNullNeighbour(indx, i, curBs);
-				if(!curBs.get(33296)) {
+				if (!curBs.get(32092)) {
 					System.out.println(i);
 				}
 				if (i == 0) {
@@ -243,7 +237,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 		LOG.info("Closest word found is: " + closestWord);
 		return closestWord;
 	}
-
+	// this might be the problem since it looks beyond null neighbours
 	protected void orWithNonNullNeighbour(int bIndx, int vecIndx, BitSet curBs) {
 		boolean wordsFound = false;
 		int rNbr = bIndx + 1;
@@ -266,15 +260,15 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 			}
 			rNbr++;
 			lNbr--;
-			if(wordsFound) {
+			if (wordsFound) {
 				break;
-			} else if(rNbr >= rLim && lNbr < lLim) {
+			} else if (rNbr >= rLim && lNbr < lLim) {
 				break;
 			}
 		}
 	}
 
-	private boolean orOperation(BitSet temp, BitSet curBs) {
+	protected boolean orOperation(BitSet temp, BitSet curBs) {
 		if (temp == null) {
 			return false;
 		}
@@ -301,12 +295,9 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	 * Method to find the squared value of euclidean distance between two vectors if
 	 * it is less than the provided minimum distance value, otherwise return -1
 	 * 
-	 * @param arr1
-	 *            - first vector
-	 * @param arr2
-	 *            - second vector
-	 * @param minDist
-	 *            - minimum distance constraint
+	 * @param arr1    - first vector
+	 * @param arr2    - second vector
+	 * @param minDist - minimum distance constraint
 	 * @return squared euclidean distance between two vector or -1
 	 */
 	protected double getSqEucDist(float[] arr1, float[] arr2, double minDist) {
