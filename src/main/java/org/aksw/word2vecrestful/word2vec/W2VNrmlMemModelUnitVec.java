@@ -27,7 +27,7 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 	public static Logger LOG = LogManager.getLogger(GenWord2VecModel.class);
 
 	public W2VNrmlMemModelUnitVec(final Map<String, float[]> word2vec, final int vectorSize) throws IOException {
-		super(word2vec, vectorSize, vectorSize, 20);
+		super(word2vec, vectorSize, vectorSize, 25);
 	}
 
 	@Override
@@ -66,6 +66,7 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 			while (wordNotFound) {
 				midEmpty = false;
 				ringRad++;
+				LOG.info("Ring Radius: " + ringRad);
 				// calculate cosine similarity of all distances
 				float[] curCompVec;
 				midBs = new BitSet(word2vec.size());
