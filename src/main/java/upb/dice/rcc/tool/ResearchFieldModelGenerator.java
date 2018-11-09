@@ -2,9 +2,12 @@ package upb.dice.rcc.tool;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -24,6 +27,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -31,8 +35,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Utility class to generate vector model for research fields in a given json
- * file input json file format:
+ * Utility class to generate vector model for research fields in a given json.<br>
+ * Input file json format:
  * 
  * <pre>
  *{
@@ -108,7 +112,7 @@ public class ResearchFieldModelGenerator {
 	 * @param line - line to sanitize
 	 * @return extracted lowercased words from the line
 	 */
-	private Set<String> fetchAllWordTokens(String line) {
+	public Set<String> fetchAllWordTokens(String line) {
 		// change to lower case
 		line = line.toLowerCase();
 		// init wordset
@@ -150,7 +154,7 @@ public class ResearchFieldModelGenerator {
 	 * @param wordSet - word set to sum all the vectors for
 	 * @return - the sum of all the word vectors
 	 */
-	private float[] getSumVector(Set<String> wordSet) {
+	public static float[] getSumVector(Set<String> wordSet, Word2VecModel w2vModel) {
 		float[] finalVec = new float[w2vModel.vectorSize];
 		for (String wordEntry : wordSet) {
 			float[] wordVec = w2vModel.word2vec.get(wordEntry);
@@ -168,7 +172,7 @@ public class ResearchFieldModelGenerator {
 	/**
 	 * Method to read the json research field file and extract each subfield's node
 	 * 
-	 * @param inputFile - file object of the input json fiel
+	 * @param inputFile - file object of the input json file
 	 * @throws IOException
 	 */
 	private void readResearchFields(File inputFile) throws IOException {
@@ -205,7 +209,8 @@ public class ResearchFieldModelGenerator {
 	 * @param stopwordFile - file containing stopwords to avoid
 	 * @throws IOException
 	 */
-	public void generateResearchFieldsModel(File inputFile, File outputFile, File stopwordFile) throws IOException {
+	public void generateResearchFieldsModel(File inputFile, File outputFile, File idMapFile, File stopwordFile)
+			throws IOException {
 		// read stop words
 		readStopWords(stopwordFile);
 		// ensure directory creation
@@ -215,6 +220,14 @@ public class ResearchFieldModelGenerator {
 		try {
 			// read and load the input file onto memory
 			readResearchFields(inputFile);
+			// generate dynamic ids and map them to research fields
+			Map<Long, String> rsrchFldLblIdMap = new HashMap<>();
+			long fldId = 1;
+			for (String rsrchFldLbl : rsrchFldWrdsMap.keySet()) {
+				rsrchFldLblIdMap.put(fldId++, rsrchFldLbl);
+			}
+			// write the map to file
+			persistIdMap(rsrchFldLblIdMap, idMapFile);
 
 			Integer totWords = rsrchFldWrdsMap.size();
 			Integer vecSize = w2vModel.vectorSize;
@@ -230,14 +243,15 @@ public class ResearchFieldModelGenerator {
 			bOutStrm.write(ModelNormalizer.END_LINE_BA);
 
 			// for each field in the map
-			for (String rsrchfld : rsrchFldWrdsMap.keySet()) {
+			for (Long rsrchFldId : rsrchFldLblIdMap.keySet()) {
+				String rsrchfld = rsrchFldLblIdMap.get(rsrchFldId);
 				Set<String> wordSet = rsrchFldWrdsMap.get(rsrchfld);
 				// calculate the sum vector for the field
-				float[] sumVec = getSumVector(wordSet);
+				float[] sumVec = getSumVector(wordSet, w2vModel);
 				// get the byte array for the normalized sum vector
 				byte[] bSumVec = ModelNormalizer.getNormalizedVecBA(sumVec);
-				// write the research field
-				bOutStrm.write(rsrchfld.getBytes(StandardCharsets.UTF_8));
+				// write the research field id
+				bOutStrm.write(rsrchFldId.toString().getBytes(StandardCharsets.UTF_8));
 				// write whitespace
 				bOutStrm.write(ModelNormalizer.WHITESPACE_BA);
 				// write the vector
@@ -259,12 +273,39 @@ public class ResearchFieldModelGenerator {
 	}
 
 	/**
+	 * Method to persist the id map to a given file as tsv
+	 * 
+	 * @param idMap     - map to persist
+	 * @param idMapFile - file to persist the map in as tsv
+	 * @throws IOException
+	 */
+	private void persistIdMap(Map<Long, String> idMap, File idMapFile) throws IOException {
+		// ensure directory creation
+		idMapFile.getParentFile().mkdirs();
+		// declare the output stream
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter(new FileWriter(idMapFile));
+			for (Long id : idMap.keySet()) {
+				bw.write(id.toString());
+				bw.write("\t");
+				bw.write(idMap.get(id));
+				bw.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			bw.close();
+		}
+	}
+
+	/**
 	 * Method to read stopwords
 	 * 
 	 * @param stopWordsFile - file to read stopwords from
 	 * @throws IOException
 	 */
-	private void readStopWords(File stopWordsFile) throws IOException {
+	public void readStopWords(File stopWordsFile) throws IOException {
 		FileInputStream fin = null;
 		BufferedReader br = null;
 		try {
@@ -283,6 +324,14 @@ public class ResearchFieldModelGenerator {
 		}
 	}
 
+	/**
+	 * Method to demonstrate example usage
+	 * 
+	 * @param args
+	 * @throws JsonProcessingException
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws IOException {
 		// initialize logger
 		PropertyConfigurator.configure(Cfg.LOG_FILE);
@@ -290,14 +339,16 @@ public class ResearchFieldModelGenerator {
 		Word2VecModel genModel = Word2VecFactory.get();
 		ResearchFieldModelGenerator generator = new ResearchFieldModelGenerator(genModel);
 		String inputFilePath = "data/rcc/train_test/sage_research_fields.json";
-		String outputFilePath = "data/rcc/ResearchFields_NormalizedModel.bin";
+		String outputFilePath = Cfg.get("org.aksw.word2vecrestful.word2vec.nrmlrsrchfldbinmodel.model");
 		String stopwordsFilePath = "data/rcc/english.stopwords.txt";
+		String idMapFilePath = "data/rcc/rsrchFldIdMap.tsv";
 
 		File inputFile = new File(inputFilePath);
 		File outputFile = new File(outputFilePath);
 		File stopwordFile = new File(stopwordsFilePath);
+		File idMapFile = new File(idMapFilePath);
 
-		generator.generateResearchFieldsModel(inputFile, outputFile, stopwordFile);
+		generator.generateResearchFieldsModel(inputFile, outputFile, idMapFile, stopwordFile);
 	}
 
 }
