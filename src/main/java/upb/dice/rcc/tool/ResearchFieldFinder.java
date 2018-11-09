@@ -100,16 +100,21 @@ public class ResearchFieldFinder {
 		W2VNrmlMemModelBruteForce memModel = new W2VNrmlMemModelBruteForce(nrmlRsrchFldMdl.word2vec,
 				nrmlRsrchFldMdl.vectorSize);
 
-		String pubFilePath = "data/rcc/ext_publications/105.txt";
+		// String pubFilePath = "data/rcc/ext_publications/105.txt";
 		String stopwordsFilePath = "data/rcc/english.stopwords.txt";
 		String idMapFilePath = "data/rcc/rsrchFldIdMap.tsv";
 
-		File inputFile = new File(pubFilePath);
+		// File inputFile = new File(pubFilePath);
 		File stopWordsFile = new File(stopwordsFilePath);
 		File idMapFile = new File(idMapFilePath);
 
 		ResearchFieldFinder finder = new ResearchFieldFinder(genModel, memModel, idMapFile, stopWordsFile);
-		finder.findClosestResearchField(inputFile);
+
+		String pubFileDirPath = "data/rcc/ext_publications/";
+		File pubFileDir = new File(pubFileDirPath);
+		for (final File fileEntry : pubFileDir.listFiles()) {
+			finder.findClosestResearchField(fileEntry);
+		}
 
 	}
 
