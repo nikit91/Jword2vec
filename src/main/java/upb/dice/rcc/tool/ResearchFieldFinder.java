@@ -12,7 +12,7 @@ import java.util.Set;
 import org.aksw.word2vecrestful.utils.Cfg;
 import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.aksw.word2vecrestful.word2vec.GenWord2VecModel;
-import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelBruteForce;
+import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelBinSrch;
 import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 import org.apache.log4j.PropertyConfigurator;
@@ -95,10 +95,11 @@ public class ResearchFieldFinder {
 		Word2VecModel genModel = Word2VecFactory.get();
 
 		Word2VecModel nrmlRsrchFldMdl = Word2VecFactory.getNrmlRsrchFldModel();
-		// final GenWord2VecModel memModel = new
-		// W2VNrmlMemModelUnitVec(nrmlRsrchFldMdl.word2vec, nrmlRsrchFldMdl.vectorSize);
-		W2VNrmlMemModelBruteForce memModel = new W2VNrmlMemModelBruteForce(nrmlRsrchFldMdl.word2vec,
-				nrmlRsrchFldMdl.vectorSize);
+		 //final GenWord2VecModel memModel = new W2VNrmlMemModelUnitVec(nrmlRsrchFldMdl.word2vec, nrmlRsrchFldMdl.vectorSize);
+		final GenWord2VecModel memModel = new W2VNrmlMemModelBinSrch(nrmlRsrchFldMdl.word2vec, nrmlRsrchFldMdl.vectorSize);
+		 memModel.process();
+//		W2VNrmlMemModelBruteForce memModel = new W2VNrmlMemModelBruteForce(nrmlRsrchFldMdl.word2vec,
+//				nrmlRsrchFldMdl.vectorSize);
 
 		// String pubFilePath = "data/rcc/ext_publications/105.txt";
 		String stopwordsFilePath = "data/rcc/english.stopwords.txt";

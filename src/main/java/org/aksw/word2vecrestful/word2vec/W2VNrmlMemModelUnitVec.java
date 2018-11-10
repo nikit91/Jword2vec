@@ -66,6 +66,9 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 			while (wordNotFound) {
 				midEmpty = false;
 				ringRad++;
+				if(ringRad>(this.bucketCount+1)/2) {
+					break;
+				}
 				LOG.info("Ring Radius: " + ringRad);
 				// calculate cosine similarity of all distances
 				float[] curCompVec;
@@ -77,7 +80,9 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 					int indx = getBucketIndex(cosSimVal);
 					BitSet curBs = new BitSet(word2vec.size());
 					// calculate middle bitset
-					curBs.or(csBucketContainer[i][indx]);
+					if(csBucketContainer[i][indx]!=null) {
+						curBs.or(csBucketContainer[i][indx]);
+					}
 					if (ringRad > 0) {
 						orWithNeighbours(indx, ringRad, 0, csBucketContainer[i], curBs);
 					}

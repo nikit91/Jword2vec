@@ -34,7 +34,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	protected float[][] vecArr;
 	protected int[] indxArr;
 	protected double[] simValArr;
-	protected int compareVecCount = 150;
+	protected int compareVecCount = 20;
 	protected int bucketCount = 10;
 	protected BitSet[][] csBucketContainer;
 
@@ -47,7 +47,14 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 		initVars();
 		// process();
 	}
-
+	/**
+	 * 
+	 * @param word2vec - word2vec model map
+	 * @param vectorSize - vector size of the vectors
+	 * @param compareVecCount - number of comparison vectors (if value greater than the number of arrays itself then the size of map is assigned)
+	 * @param bucketCount
+	 * @throws IOException
+	 */
 	public W2VNrmlMemModelBinSrch(final Map<String, float[]> word2vec, final int vectorSize, int compareVecCount,
 			int bucketCount) throws IOException {
 		this.bucketCount = bucketCount;
@@ -59,6 +66,9 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	}
 
 	public void initVars() {
+		if(this.compareVecCount>this.word2vec.size()) {
+			this.compareVecCount = this.word2vec.size();
+		}
 		comparisonVecs = new float[compareVecCount][vectorSize];
 		csBucketContainer = new BitSet[compareVecCount][bucketCount];
 	}
@@ -87,6 +97,9 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 
 	private void setAllComparisonVecs() {
 		int diff = (word2vec.size() / compareVecCount) - 1;
+		if(diff<1) {
+			diff=1;
+		}
 		int curIndx = diff;
 		for (int i = 1; i < compareVecCount; i++) {
 			comparisonVecs[i] = vecArr[indxArr[curIndx]];
@@ -209,9 +222,6 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 					curBs.or(csBucketContainer[i][indx]);
 				}
 				orWithNonNullNeighbour(indx, i, curBs);
-				if (!curBs.get(32092)) {
-					System.out.println(i);
-				}
 				if (i == 0) {
 					finBitSet = curBs;
 				} else {
