@@ -63,9 +63,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author nikitsrivastava
  *
  */
-public class ResearchFieldModelGenerator {
+public class RsrchFldMdlGnrtr_OldJson {
 
-	public static Logger LOG = LogManager.getLogger(ResearchFieldModelGenerator.class);
+	public static Logger LOG = LogManager.getLogger(RsrchFldMdlGnrtr_OldJson.class);
 
 	private Map<String, Set<String>> rsrchFldWrdsMap = new HashMap<>();
 
@@ -77,7 +77,7 @@ public class ResearchFieldModelGenerator {
 	private Word2VecModel w2vModel;
 	private Set<String> stopWords = new HashSet<>();
 
-	public ResearchFieldModelGenerator(Word2VecModel w2vModel) {
+	public RsrchFldMdlGnrtr_OldJson(Word2VecModel w2vModel) {
 		this.w2vModel = w2vModel;
 	}
 
@@ -337,7 +337,7 @@ public class ResearchFieldModelGenerator {
 		PropertyConfigurator.configure(Cfg.LOG_FILE);
 		// init w2v model
 		Word2VecModel genModel = Word2VecFactory.get();
-		ResearchFieldModelGenerator generator = new ResearchFieldModelGenerator(genModel);
+		RsrchFldMdlGnrtr_OldJson generator = new RsrchFldMdlGnrtr_OldJson(genModel);
 		String inputFilePath = "data/rcc/train_test/sage_research_fields.json";
 		String outputFilePath = Cfg.get("org.aksw.word2vecrestful.word2vec.nrmlrsrchfldbinmodel.model");
 		String stopwordsFilePath = "data/rcc/english.stopwords.txt";

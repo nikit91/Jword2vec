@@ -98,5 +98,10 @@ public class W2VNrmlMemModelBruteForce implements GenWord2VecModel {
 	public Map<String, float[]> getWord2VecMap() {
 		return this.word2vec;
 	}
+	
+	@Override
+	public Map<String, float[]> getW2VMap() {
+		return word2vec;
+	}
 
 }

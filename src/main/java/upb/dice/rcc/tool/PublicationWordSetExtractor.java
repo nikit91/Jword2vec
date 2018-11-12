@@ -3,18 +3,20 @@ package upb.dice.rcc.tool;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
 
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
- * Class to extract the wordset from the given publication file.
- *<br>
+ * Class to extract the wordset from the given publication file. <br>
  * Publication input file json format:
  * 
  * <pre>
@@ -39,29 +41,33 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class PublicationWordSetExtractor {
 	public static final String[] FLDS_TO_READ = { "abstract", "title", "keywords" };
-	ResearchFieldModelGenerator researchFieldModelGenerator;
+	RsrchFldMdlGnrtrCsv researchFieldModelGenerator;
+	private Word2VecModel w2vModel;
 
 	public PublicationWordSetExtractor(Word2VecModel w2vModel, File stopWordsFile) throws IOException {
-		this.researchFieldModelGenerator = new ResearchFieldModelGenerator(w2vModel);
-		this.researchFieldModelGenerator.readStopWords(stopWordsFile);
+		this.w2vModel = w2vModel;
+		this.researchFieldModelGenerator = new RsrchFldMdlGnrtrCsv(w2vModel);
 	}
+
 	/**
 	 * Method to extract the wordset from the given publication file
+	 * 
 	 * @param inputFile - the given publication file
 	 * @return - set of the all the words in in the publication file
 	 * @throws IOException
 	 */
-	public Set<String> extractPublicationWordSet(File inputFile) throws IOException {
+	public Map<String, List<String>> extractPublicationWordSet(File inputFile) throws IOException {
 		// init wordset
-		Set<String> wordSet = new HashSet<>();
+		Map<String, List<String>> fldWordsMap = new HashMap<>();
 		FileInputStream fin = null;
 		try {
 			fin = new FileInputStream(inputFile);
 			// Read file into a json
-			ObjectNode inpObj = (ObjectNode) ResearchFieldModelGenerator.OBJ_READER.readTree(fin);
+			ObjectNode inpObj = (ObjectNode) RsrchFldMdlGnrtr_OldJson.OBJ_READER.readTree(fin);
 			for (String fld : FLDS_TO_READ) {
+				List<String> wordList = new ArrayList<>();
 				JsonNode entryNode = inpObj.get(fld);
-				if(entryNode == null) {
+				if (entryNode == null) {
 					continue;
 				}
 				ArrayNode phraseArr = (ArrayNode) entryNode;
@@ -69,15 +75,16 @@ public class PublicationWordSetExtractor {
 				while (phraseItr.hasNext()) {
 					JsonNode phraseEntry = phraseItr.next();
 					String line = phraseEntry.asText();
-					wordSet.addAll(this.researchFieldModelGenerator.fetchAllWordTokens(line));
+					wordList.addAll(RccUtil.fetchAllWordTokens(line, w2vModel));
 				}
+				fldWordsMap.put(fld, wordList);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			fin.close();
 		}
-		return wordSet;
+		return fldWordsMap;
 	}
 
 }

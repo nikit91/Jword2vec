@@ -374,4 +374,9 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 		this.bucketCount = bucketCount;
 	}
 
+	@Override
+	public Map<String, float[]> getW2VMap() {
+		return word2vec;
+	}
+
 }
