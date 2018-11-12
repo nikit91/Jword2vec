@@ -1,4 +1,4 @@
-package upb.dice.rcc.tool;
+package upb.dice.rcc.tool.rfld.generator;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;

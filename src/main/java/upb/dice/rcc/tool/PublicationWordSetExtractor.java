@@ -15,6 +15,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import upb.dice.rcc.tool.rfld.generator.RsrchFldMdlGnrtrCsv;
+import upb.dice.rcc.tool.rfld.generator.RsrchFldMdlGnrtr_OldJson;
+
 /**
  * Class to extract the wordset from the given publication file. <br>
  * Publication input file json format:
@@ -44,7 +47,7 @@ public class PublicationWordSetExtractor {
 	RsrchFldMdlGnrtrCsv researchFieldModelGenerator;
 	private Word2VecModel w2vModel;
 
-	public PublicationWordSetExtractor(Word2VecModel w2vModel, File stopWordsFile) throws IOException {
+	public PublicationWordSetExtractor(Word2VecModel w2vModel) throws IOException {
 		this.w2vModel = w2vModel;
 		this.researchFieldModelGenerator = new RsrchFldMdlGnrtrCsv(w2vModel);
 	}
