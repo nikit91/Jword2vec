@@ -108,6 +108,8 @@ public class RccMain {
 
 	private void writeJsonToFile(JsonNode node, File outputFile)
 			throws JsonGenerationException, JsonMappingException, IOException {
+		// ensure directory creation
+		outputFile.getParentFile().mkdirs();
 		OBJ_WRITER.writeValue(outputFile, node);
 	}
 

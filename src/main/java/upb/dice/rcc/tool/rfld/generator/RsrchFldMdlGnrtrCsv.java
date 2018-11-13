@@ -23,8 +23,8 @@ import upb.dice.rcc.tool.RccUtil;
 import upb.dice.rcc.tool.gnrtr.RccModelGenerator;
 
 /**
- * Utility class to generate vector model for research fields in a given
- * csv file.<br>
+ * Utility class to generate vector model for research fields in a given csv
+ * file.<br>
  * Input file csv format:
  * 
  * <pre>
@@ -52,9 +52,7 @@ public class RsrchFldMdlGnrtrCsv extends RccModelGenerator {
 
 	public static Logger LOG = LogManager.getLogger(RsrchFldMdlGnrtrCsv.class);
 
-	private Map<String, List<String>> rsrchFldWrdsMap = new HashMap<>();
 	private Map<String, List<String>> wordListCacheMap = new HashMap<>();
-	private Word2VecModel w2vModel;
 
 	public static final int[] DEFAULT_COL_INDXS = { 0, 1, 2, 4 };
 	public static final int DEFAULT_ID_INDX = 3;
@@ -105,7 +103,9 @@ public class RsrchFldMdlGnrtrCsv extends RccModelGenerator {
 				}
 				// extract id
 				String idText = lineArr[idIndx];
-				rsrchFldWrdsMap.put(idText, rsrchFldWords);
+				if (rsrchFldWords.size() > 0) {
+					wrdsIdMap.put(idText, rsrchFldWords);
+				}
 			}
 
 		} finally {

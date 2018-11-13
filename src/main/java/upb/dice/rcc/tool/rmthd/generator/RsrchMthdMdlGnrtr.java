@@ -92,7 +92,6 @@ public class RsrchMthdMdlGnrtr extends RccModelGenerator {
 	 */
 	private void mapWordsToField(JsonNode rsrchMthd) {
 		List<String> wordList = new ArrayList<>();
-		wrdsIdMap.put(rsrchMthd.get(ID_FLD).asText(), wordList);
 		// for each useful field in the entry
 		for (String fld : FLDS_TO_READ) {
 			JsonNode subNode = rsrchMthd.get(fld);
@@ -100,6 +99,9 @@ public class RsrchMthdMdlGnrtr extends RccModelGenerator {
 				String line = subNode.get(VALUE_FLD).asText();
 				wordList.addAll(RccUtil.fetchAllWordTokens(line, w2vModel));
 			}
+		}
+		if (wordList.size() > 0) {
+			wrdsIdMap.put(rsrchMthd.get(ID_FLD).asText(), wordList);
 		}
 
 	}
