@@ -1,10 +1,8 @@
 package upb.dice.rcc.tool.finder;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,47 +12,82 @@ import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.aksw.word2vecrestful.word2vec.GenWord2VecModel;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 
+import upb.dice.rcc.tool.RccNounPhraseLabelPair;
 import upb.dice.rcc.tool.RccUtil;
 
 /**
- * Class to help find the closest research field for a given publication
+ * Extended implementation of {@link RccFinderSnglrCosSim}. Instead of the top
+ * most cosine similarity this class uses top
+ * {@link RccFinderTopCosSimSum#topCount} number of entries to find the closest
+ * entry in the custom model.
  * 
  * @author nikitsrivastava
  *
  */
-public class RccFinderTopCosSimSum extends RccFinder{
+public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
 
-	public static final Map<String, Float> FIELD_WEIGHT_MAP = new HashMap<String, Float>();
 	public static final int TOP_COUNT = 10;
-	static {
-		FIELD_WEIGHT_MAP.put("keywords", 1.2f);
-	}
+	/**
+	 * Number of top words to consider for the final similarity
+	 */
+	protected int topCount;
 
+	/**
+	 * @see RccFinderSnglrCosSim#RccFinderSnglrCosSim(Word2VecModel,
+	 *      GenWord2VecModel)
+	 */
 	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel) throws IOException {
 		super(genModel, memModel);
+		this.topCount = TOP_COUNT;
 	}
 
 	/**
-	 * Method to find the closest research field for the given publication
-	 * 
-	 * @param pubFile - file for the given publication
-	 * @throws IOException
+	 * @see RccFinderSnglrCosSim#RccFinderSnglrCosSim(Word2VecModel,
+	 *      GenWord2VecModel, Map)
 	 */
-	public RccNounPhrasePair findClosestResearchField(File pubFile) throws IOException {
-		Map<String, List<String>> fldWordsMap = wordSetExtractor.extractPublicationWordSet(pubFile);
-		List<String> wordList = new ArrayList<>();
-		for (List<String> wordEntries : fldWordsMap.values()) {
-			wordList.addAll(wordEntries);
-		}
-		RccNounPhrasePair phrsPair = fetchSimilarRsrchFld(fldWordsMap, pubFile.getName());
-		return phrsPair;
+	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel, Map<String, Float> weightMap)
+			throws IOException {
+		super(genModel, memModel, weightMap);
+		this.topCount = TOP_COUNT;
 	}
 
-	private RccNounPhrasePair fetchSimilarRsrchFld(Map<String, List<String>> fldWordsMap, String fileLabel) {
-		RccNounPhrasePair resPair = null;
-		List<RccNounPhrasePair> pairList = new ArrayList<>();
+	/**
+	 * Constructor to initialize instance of {@link RccFinder} using the given
+	 * general Normalized word model and a Word2Vec custom model
+	 * 
+	 * @param genModel - {@link #genModel}
+	 * @param memModel - {@link #memModel}
+	 * @param topCount - {@link #topCount}
+	 * @throws IOException
+	 */
+	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel, int topCount) throws IOException {
+		super(genModel, memModel);
+		this.topCount = topCount;
+	}
+
+	/**
+	 * 
+	 * Constructor to initialize instance of {@link RccFinder} using the given
+	 * general Normalized word model and a Word2Vec custom model
+	 * 
+	 * @param genModel  - {@link #genModel}
+	 * @param memModel  - {@link #memModel}
+	 * @param topCount  - {@link #topCount}
+	 * @param weightMap - {@link #weightMap}
+	 * @throws IOException
+	 */
+	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel, int topCount,
+			Map<String, Float> weightMap) throws IOException {
+		super(genModel, memModel, weightMap);
+		this.topCount = topCount;
+	}
+
+	@Override
+	protected RccNounPhraseLabelPair fetchSimilarRsrchFld(Map<String, List<String>> fldWordsMap, String fileLabel) {
+		RccNounPhraseLabelPair resPair = null;
+		List<RccNounPhraseLabelPair> pairList = new ArrayList<>();
 		for (String fldLabel : fldWordsMap.keySet()) {
-			Float wgth = FIELD_WEIGHT_MAP.get(fldLabel);
+			Float wgth = weightMap.get(fldLabel);
 			if (wgth == null) {
 				wgth = 1f;
 			}
@@ -68,7 +101,7 @@ public class RccFinderTopCosSimSum extends RccFinder{
 					Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec,
 							memModel.getW2VMap().get(closestWord));
 					cosSim *= wgth;
-					RccNounPhrasePair tmpPair = new RccNounPhrasePair(wordEntry, closestWord, cosSim);
+					RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(wordEntry, closestWord, cosSim);
 					pairList.add(tmpPair);
 				}
 			}
@@ -76,9 +109,9 @@ public class RccFinderTopCosSimSum extends RccFinder{
 		}
 		Collections.sort(pairList, Collections.reverseOrder());
 		resPair = pairList.get(0);
-		List<RccNounPhrasePair> topPairList = new ArrayList<>();
-		if (pairList.size() > TOP_COUNT) {
-			topPairList.addAll(pairList.subList(0, TOP_COUNT));
+		List<RccNounPhraseLabelPair> topPairList = new ArrayList<>();
+		if (pairList.size() > topCount) {
+			topPairList.addAll(pairList.subList(0, topCount));
 		} else {
 			topPairList.addAll(pairList);
 		}
@@ -86,17 +119,25 @@ public class RccFinderTopCosSimSum extends RccFinder{
 		return resPair;
 	}
 
-	private RccNounPhrasePair findClosestSumEntry(List<RccNounPhrasePair> topPairList, String fileLabel) {
-		RccNounPhrasePair resPair = null;
+	/**
+	 * Method to find the closest entry in the custom model using the sum of all
+	 * word vectors from the topPairList
+	 * 
+	 * @param topPairList - list of all the top selected words
+	 * @param fileLabel   - label of the publication file
+	 * @return
+	 */
+	protected RccNounPhraseLabelPair findClosestSumEntry(List<RccNounPhraseLabelPair> topPairList, String fileLabel) {
+		RccNounPhraseLabelPair resPair = null;
 		List<String> wordList = new ArrayList<>();
-		for (RccNounPhrasePair pair : topPairList) {
+		for (RccNounPhraseLabelPair pair : topPairList) {
 			wordList.add(pair.getNounPhrase());
 		}
 		float[] sumVec = RccUtil.getSumVector(wordList, genModel);
 		float[] normSumVec = Word2VecMath.normalize(sumVec);
 		String closestWord = memModel.getClosestEntry(normSumVec);
 		Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec, memModel.getW2VMap().get(closestWord));
-		resPair = new RccNounPhrasePair(fileLabel, closestWord, cosSim);
+		resPair = new RccNounPhraseLabelPair(fileLabel, closestWord, cosSim);
 		return resPair;
 	}
 

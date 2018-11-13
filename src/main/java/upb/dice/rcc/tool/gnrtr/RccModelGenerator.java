@@ -16,26 +16,42 @@ import org.apache.log4j.Logger;
 
 import upb.dice.rcc.tool.RccUtil;
 
+/**
+ * Abstract class to help Generate a Word2Vec model for a given input file for
+ * Rich Context Challenge
+ * 
+ * @author nikitsrivastava
+ *
+ */
 public abstract class RccModelGenerator {
 
 	public static Logger LOG = LogManager.getLogger(RccModelGenerator.class);
-
+	/**
+	 * Mapping of Word/Phrase/Id to their corresponding list of words
+	 */
 	protected Map<String, List<String>> wrdsIdMap = new HashMap<>();
+	/**
+	 * General Normalized Word2Vec Model
+	 */
 	protected Word2VecModel w2vModel;
 
 	abstract protected void loadWordIdMap(File inputFile) throws IOException;
 
+	/**
+	 * Constructor to initialize {@link RccModelGenerator}
+	 * 
+	 * @param w2vModel - instance of {@link #w2vModel}
+	 */
 	public RccModelGenerator(Word2VecModel w2vModel) {
 		this.w2vModel = w2vModel;
 	}
 
 	/**
-	 * Method to generate a research field model for the given input research filed
-	 * json file
+	 * Method to generate a custom Word2Vec Model for a given input file into a
+	 * given outputFile
 	 * 
-	 * @param inputFile    - input json file
-	 * @param outputFile   - output bin model file
-	 * @param stopwordFile - file containing stopwords to avoid
+	 * @param inputFile  - input file
+	 * @param outputFile - output bin model file
 	 * @throws IOException
 	 */
 	public void generateResearchFieldsModel(File inputFile, File outputFile) throws IOException {

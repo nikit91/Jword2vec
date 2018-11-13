@@ -17,14 +17,17 @@ import org.apache.log4j.PropertyConfigurator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import upb.dice.rcc.tool.RccNounPhraseLabelPair;
 import upb.dice.rcc.tool.finder.RccFinderTopCosSimSum;
-import upb.dice.rcc.tool.finder.RccNounPhrasePair;
-import upb.dice.rcc.tool.rfld.generator.RsrchFldMdlGnrtrCsv;
 
+/**
+ * Class to demonstrate the usage of methods to find the closest research
+ * methods
+ * 
+ * @author nikitsrivastava
+ *
+ */
 public class RsrchMthdFinderMain {
-
-	public static int idIndx = RsrchFldMdlGnrtrCsv.DEFAULT_ID_INDX;
-	public static int resColIndx = 4;
 
 	/**
 	 * Method to demonstrate example usage
@@ -40,9 +43,10 @@ public class RsrchMthdFinderMain {
 		// init w2v model
 		Word2VecModel genModel = Word2VecFactory.get();
 
-		Word2VecModel nrmlRsrchFldMdl = Word2VecFactory.getNrmlRsrchFldModel();
-		final GenWord2VecModel memModel = new W2VNrmlMemModelBinSrch(nrmlRsrchFldMdl.word2vec,
-				nrmlRsrchFldMdl.vectorSize);
+		Word2VecModel nrmlRsrchMthdMdl = Word2VecFactory.getNrmlRsrchMthdModel();
+
+		final GenWord2VecModel memModel = new W2VNrmlMemModelBinSrch(nrmlRsrchMthdMdl.word2vec,
+				nrmlRsrchMthdMdl.vectorSize);
 		memModel.process();
 
 		RccFinderTopCosSimSum finder = new RccFinderTopCosSimSum(genModel, memModel);
@@ -52,7 +56,7 @@ public class RsrchMthdFinderMain {
 		Map<String, Set<String>> resIdMap = new HashMap<>();
 		for (final File fileEntry : pubFileDir.listFiles()) {
 
-			RccNounPhrasePair tmpPair = finder.findClosestResearchField(fileEntry);
+			RccNounPhraseLabelPair tmpPair = finder.findClosestResearchField(fileEntry);
 			String fldId = tmpPair.getClosestWord();
 			Set<String> fileNameSet = resIdMap.get(fldId);
 			if (fileNameSet == null) {
@@ -62,7 +66,7 @@ public class RsrchMthdFinderMain {
 			fileNameSet.add(fileEntry.getName());
 		}
 
-		RsrchMthdPrinter.printResults(resIdMap, idIndx, resColIndx);
+		RsrchMthdPrinter.printResults(resIdMap);
 
 	}
 

@@ -16,6 +16,12 @@ import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+/**
+ * Class to encapsulate all the utility methods used for Rich Context Challenge
+ * 
+ * @author nikitsrivastava
+ *
+ */
 public class RccUtil {
 
 	public static Logger LOG = LogManager.getLogger(RccUtil.class);
@@ -41,9 +47,10 @@ public class RccUtil {
 	}
 
 	/**
-	 * Method to read stopwords
+	 * Method to read and return the set of stop-words from a given file
 	 * 
-	 * @param stopWordsFile - file to read stopwords from
+	 * @param stopWordsFile - file to read stop-words from
+	 * @return - set to stop words extracted from the file
 	 * @throws IOException
 	 */
 	public static Set<String> readStopWords(File stopWordsFile) throws IOException {

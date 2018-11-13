@@ -1,12 +1,12 @@
-package upb.dice.rcc.tool.finder;
+package upb.dice.rcc.tool;
 
-public class RccNounPhrasePair implements Comparable<RccNounPhrasePair> {
+public class RccNounPhraseLabelPair implements Comparable<RccNounPhraseLabelPair> {
 
 	private String nounPhrase;
 	private String closestWord;
 	private double cosineSim;
 
-	public RccNounPhrasePair(String nounPhrase, String closestWord, double cosineSim) {
+	public RccNounPhraseLabelPair(String nounPhrase, String closestWord, double cosineSim) {
 		super();
 		this.nounPhrase = nounPhrase;
 		this.closestWord = closestWord;
@@ -44,7 +44,7 @@ public class RccNounPhrasePair implements Comparable<RccNounPhrasePair> {
 	}
 
 	@Override
-	public int compareTo(RccNounPhrasePair other) {
+	public int compareTo(RccNounPhraseLabelPair other) {
 		double simDiff = this.cosineSim - other.cosineSim;
 		int retVal = 0;
 		if (simDiff > 0) {

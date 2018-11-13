@@ -24,7 +24,7 @@ import upb.dice.rcc.tool.gnrtr.RccModelGenerator;
 
 /**
  * Utility class to generate vector model for research fields in a given
- * json.<br>
+ * csv file.<br>
  * Input file csv format:
  * 
  * <pre>

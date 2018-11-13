@@ -53,7 +53,7 @@ public class PublicationWordSetExtractor {
 	}
 
 	/**
-	 * Method to extract the wordset from the given publication file
+	 * Method to extract the wordlist from the given publication file
 	 * 
 	 * @param inputFile - the given publication file
 	 * @return - set of the all the words in in the publication file

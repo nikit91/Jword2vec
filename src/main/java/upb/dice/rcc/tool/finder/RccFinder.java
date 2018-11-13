@@ -7,9 +7,11 @@ import org.aksw.word2vecrestful.word2vec.GenWord2VecModel;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 
 import upb.dice.rcc.tool.PublicationWordSetExtractor;
+import upb.dice.rcc.tool.RccNounPhraseLabelPair;
 
 /**
- * Class to help find the closest research field for a given publication
+ * Abstract Class to help find the closest research field for a given
+ * publication
  * 
  * @author nikitsrivastava
  *
@@ -17,11 +19,24 @@ import upb.dice.rcc.tool.PublicationWordSetExtractor;
 public abstract class RccFinder {
 
 	protected PublicationWordSetExtractor wordSetExtractor;
+	/**
+	 * General Normalized Word2Vec Model
+	 */
 	protected Word2VecModel genModel;
+	/**
+	 * Custom Word2Vec Model
+	 */
 	protected GenWord2VecModel memModel;
 
-	public RccFinder(Word2VecModel genModel, GenWord2VecModel memModel)
-			throws IOException {
+	/**
+	 * Contructor to initialize instance of {@link RccFinder} using the given
+	 * general Normalized word model and a Word2Vec custom model
+	 * 
+	 * @param genModel - {@link #genModel}
+	 * @param memModel - {@link #memModel}
+	 * @throws IOException
+	 */
+	public RccFinder(Word2VecModel genModel, GenWord2VecModel memModel) throws IOException {
 		this.genModel = genModel;
 		this.memModel = memModel;
 		this.wordSetExtractor = new PublicationWordSetExtractor(genModel);
@@ -33,6 +48,6 @@ public abstract class RccFinder {
 	 * @param pubFile - file for the given publication
 	 * @throws IOException
 	 */
-	abstract public RccNounPhrasePair findClosestResearchField(File pubFile) throws IOException;
+	abstract public RccNounPhraseLabelPair findClosestResearchField(File pubFile) throws IOException;
 
 }

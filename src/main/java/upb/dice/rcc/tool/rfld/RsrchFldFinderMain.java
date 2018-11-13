@@ -17,10 +17,16 @@ import org.apache.log4j.PropertyConfigurator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import upb.dice.rcc.tool.RccNounPhraseLabelPair;
 import upb.dice.rcc.tool.finder.RccFinderTopCosSimSum;
-import upb.dice.rcc.tool.finder.RccNounPhrasePair;
 import upb.dice.rcc.tool.rfld.generator.RsrchFldMdlGnrtrCsv;
 
+/**
+ * Class to demonstrate the usage of methods to find the closest research fields
+ * 
+ * @author nikitsrivastava
+ *
+ */
 public class RsrchFldFinderMain {
 
 	public static int idIndx = RsrchFldMdlGnrtrCsv.DEFAULT_ID_INDX;
@@ -52,7 +58,7 @@ public class RsrchFldFinderMain {
 		Map<String, Set<String>> resIdMap = new HashMap<>();
 		for (final File fileEntry : pubFileDir.listFiles()) {
 
-			RccNounPhrasePair tmpPair = finder.findClosestResearchField(fileEntry);
+			RccNounPhraseLabelPair tmpPair = finder.findClosestResearchField(fileEntry);
 			String fldId = tmpPair.getClosestWord();
 			Set<String> fileNameSet = resIdMap.get(fldId);
 			if (fileNameSet == null) {

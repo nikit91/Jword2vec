@@ -25,6 +25,43 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import upb.dice.rcc.tool.RccUtil;
 import upb.dice.rcc.tool.gnrtr.RccModelGenerator;
 
+/**
+ * Utility class to generate vector model for research methods in a given json
+ * file.<br>
+ * Input file json format:
+ * 
+ * <pre>
+ *{
+ * "@graph": [
+ *  {
+ *  "@id": "...",
+ *   "skos:definition": {
+ *     "@value": "..."
+ *    },
+ *   "skos:prefLabel": {
+ *     "@value": "..."
+ *    }
+ *  },
+ *  { ... } ...
+ * ]
+ *}
+ * </pre>
+ * <dl>
+ * <dt>@graph</dt>
+ * <dd>container element for all the research methods</dd>
+ * <dt>@id</dt>
+ * <dd>id of the method</dd>
+ * <dt>skos:definition</dt>
+ * <dd>container element for the definition of the method</dd>
+ * <dt>skos:prefLabel</dt>
+ * <dd>container element for the label of the method</dd>
+ * <dt>@value</dt>
+ * <dd>value of the respective element</dd>
+ * </dl>
+ * 
+ * @author nikitsrivastava
+ *
+ */
 public class RsrchMthdMdlGnrtr extends RccModelGenerator {
 
 	public static Logger LOG = LogManager.getLogger(RsrchMthdMdlGnrtr.class);
@@ -37,6 +74,10 @@ public class RsrchMthdMdlGnrtr extends RccModelGenerator {
 	public static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
 	public static final ObjectReader OBJ_READER = OBJ_MAPPER.reader();
 
+	/**
+	 * @see RccModelGenerator#RccModelGenerator(Word2VecModel)
+	 * @param w2vModel
+	 */
 	public RsrchMthdMdlGnrtr(Word2VecModel w2vModel) {
 		super(w2vModel);
 	}

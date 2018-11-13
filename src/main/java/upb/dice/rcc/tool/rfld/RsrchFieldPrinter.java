@@ -8,8 +8,13 @@ import java.util.Set;
 
 import com.opencsv.CSVReader;
 
-public abstract class RsrchFieldPrinter{
-
+/**
+ * Class to help with printing of results for Research Field mapping
+ * 
+ * @author nikitsrivastava
+ *
+ */
+public class RsrchFieldPrinter {
 
 	public static void printResults(Map<String, Set<String>> resIdMap, int idIndx, int resColIndx) throws IOException {
 		// logic to read labels from the csv file
