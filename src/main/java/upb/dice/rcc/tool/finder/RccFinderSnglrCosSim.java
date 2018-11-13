@@ -14,6 +14,7 @@ import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.aksw.word2vecrestful.word2vec.GenWord2VecModel;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 
+import upb.dice.rcc.tool.PublicationWordSetExtractor;
 import upb.dice.rcc.tool.RccNounPhraseLabelPair;
 import upb.dice.rcc.tool.RccUtil;
 
@@ -41,15 +42,31 @@ public class RccFinderSnglrCosSim extends RccFinder {
 
 	/**
 	 * Contructor to initialize instance of {@link RccFinderSnglrCosSim} using the
-	 * given general Normalized word model and a Word2Vec custom model. The
+	 * given general Non-Normalized word model and a Word2Vec custom model. The
 	 * weightMap is set as the default {@link FIELD_WEIGHT_MAP}
 	 * 
 	 * @param genModel - {@link #genModel}
 	 * @param memModel - {@link #memModel}
 	 * @throws IOException
 	 */
-	public RccFinderSnglrCosSim(Word2VecModel genModel, GenWord2VecModel memModel) throws IOException {
+	/*public RccFinderSnglrCosSim(Word2VecModel genModel, GenWord2VecModel memModel) throws IOException {
 		super(genModel, memModel);
+		this.weightMap = FIELD_WEIGHT_MAP;
+	}*/
+
+	/**
+	 * Contructor to initialize instance of {@link RccFinderSnglrCosSim} using the
+	 * given general Non-Normalized word model and a Word2Vec custom model. The
+	 * weightMap is set as the default {@link FIELD_WEIGHT_MAP}
+	 * 
+	 * @param genModel         - {@link #genModel}
+	 * @param memModel         - {@link #memModel}
+	 * @param wordSetExtractor - {@link #wordSetExtractor}
+	 * @throws IOException
+	 */
+	public RccFinderSnglrCosSim(Word2VecModel genModel, GenWord2VecModel memModel,
+			PublicationWordSetExtractor wordSetExtractor) throws IOException {
+		super(genModel, memModel, wordSetExtractor);
 		this.weightMap = FIELD_WEIGHT_MAP;
 	}
 
@@ -62,9 +79,9 @@ public class RccFinderSnglrCosSim extends RccFinder {
 	 * @param weightMap - {@link #weightMap}
 	 * @throws IOException
 	 */
-	public RccFinderSnglrCosSim(Word2VecModel genModel, GenWord2VecModel memModel, Map<String, Float> weightMap)
+	public RccFinderSnglrCosSim(Word2VecModel genModel, GenWord2VecModel memModel, PublicationWordSetExtractor wordSetExtractor, Map<String, Float> weightMap)
 			throws IOException {
-		super(genModel, memModel);
+		super(genModel, memModel, wordSetExtractor);
 		this.weightMap = weightMap;
 	}
 

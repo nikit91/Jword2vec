@@ -10,6 +10,7 @@ import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.aksw.word2vecrestful.word2vec.GenWord2VecModel;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 
+import upb.dice.rcc.tool.PublicationWordSetExtractor;
 import upb.dice.rcc.tool.RccNounPhraseLabelPair;
 import upb.dice.rcc.tool.RccUtil;
 
@@ -25,8 +26,15 @@ public class RccFinderSumAll extends RccFinder {
 	/**
 	 * @see RccFinder#RccFinder(Word2VecModel, GenWord2VecModel)
 	 */
-	public RccFinderSumAll(Word2VecModel genModel, GenWord2VecModel memModel) throws IOException {
+	/*public RccFinderSumAll(Word2VecModel genModel, GenWord2VecModel memModel) throws IOException {
 		super(genModel, memModel);
+	}*/
+	
+	/**
+	 * @see RccFinder#RccFinder(Word2VecModel, GenWord2VecModel, PublicationWordSetExtractor)
+	 */
+	public RccFinderSumAll(Word2VecModel genModel, GenWord2VecModel memModel, PublicationWordSetExtractor wordSetExtractor) throws IOException {
+		super(genModel, memModel, wordSetExtractor);
 	}
 
 	@Override

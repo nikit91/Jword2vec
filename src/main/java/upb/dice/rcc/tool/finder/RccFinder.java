@@ -18,9 +18,12 @@ import upb.dice.rcc.tool.RccNounPhraseLabelPair;
  */
 public abstract class RccFinder {
 
+	/**
+	 * WordsetExtractor instance for publications
+	 */
 	protected PublicationWordSetExtractor wordSetExtractor;
 	/**
-	 * General Normalized Word2Vec Model
+	 * General Non-Normalized Word2Vec Model
 	 */
 	protected Word2VecModel genModel;
 	/**
@@ -36,10 +39,26 @@ public abstract class RccFinder {
 	 * @param memModel - {@link #memModel}
 	 * @throws IOException
 	 */
-	public RccFinder(Word2VecModel genModel, GenWord2VecModel memModel) throws IOException {
+	/*public RccFinder(Word2VecModel genModel, GenWord2VecModel memModel) throws IOException {
 		this.genModel = genModel;
 		this.memModel = memModel;
 		this.wordSetExtractor = new PublicationWordSetExtractor(genModel);
+	}*/
+
+	/**
+	 * Contructor to initialize instance of {@link RccFinder} using the given
+	 * general Normalized word model and a Word2Vec custom model
+	 * 
+	 * @param genModel         - {@link #genModel}
+	 * @param memModel         - {@link #memModel}
+	 * @param wordSetExtractor - {@link #wordSetExtractor}
+	 * @throws IOException
+	 */
+	public RccFinder(Word2VecModel genModel, GenWord2VecModel memModel, PublicationWordSetExtractor wordSetExtractor)
+			throws IOException {
+		this.genModel = genModel;
+		this.memModel = memModel;
+		this.wordSetExtractor = wordSetExtractor;
 	}
 
 	/**

@@ -31,7 +31,7 @@ public abstract class RccModelGenerator {
 	 */
 	protected Map<String, List<String>> wrdsIdMap = new HashMap<>();
 	/**
-	 * General Normalized Word2Vec Model
+	 * General Non-Normalized Word2Vec Model
 	 */
 	protected Word2VecModel w2vModel;
 

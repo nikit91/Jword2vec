@@ -12,6 +12,7 @@ import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.aksw.word2vecrestful.word2vec.GenWord2VecModel;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 
+import upb.dice.rcc.tool.PublicationWordSetExtractor;
 import upb.dice.rcc.tool.RccNounPhraseLabelPair;
 import upb.dice.rcc.tool.RccUtil;
 
@@ -36,8 +37,8 @@ public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
 	 * @see RccFinderSnglrCosSim#RccFinderSnglrCosSim(Word2VecModel,
 	 *      GenWord2VecModel)
 	 */
-	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel) throws IOException {
-		super(genModel, memModel);
+	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel, PublicationWordSetExtractor wordSetExtractor) throws IOException {
+		super(genModel, memModel, wordSetExtractor);
 		this.topCount = TOP_COUNT;
 	}
 
@@ -45,9 +46,9 @@ public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
 	 * @see RccFinderSnglrCosSim#RccFinderSnglrCosSim(Word2VecModel,
 	 *      GenWord2VecModel, Map)
 	 */
-	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel, Map<String, Float> weightMap)
+	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel, PublicationWordSetExtractor wordSetExtractor, Map<String, Float> weightMap)
 			throws IOException {
-		super(genModel, memModel, weightMap);
+		super(genModel, memModel, wordSetExtractor, weightMap);
 		this.topCount = TOP_COUNT;
 	}
 
@@ -60,8 +61,8 @@ public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
 	 * @param topCount - {@link #topCount}
 	 * @throws IOException
 	 */
-	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel, int topCount) throws IOException {
-		super(genModel, memModel);
+	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel, PublicationWordSetExtractor wordSetExtractor, int topCount) throws IOException {
+		super(genModel, memModel, wordSetExtractor);
 		this.topCount = topCount;
 	}
 
@@ -76,9 +77,9 @@ public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
 	 * @param weightMap - {@link #weightMap}
 	 * @throws IOException
 	 */
-	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel, int topCount,
+	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel, PublicationWordSetExtractor wordSetExtractor, int topCount,
 			Map<String, Float> weightMap) throws IOException {
-		super(genModel, memModel, weightMap);
+		super(genModel, memModel, wordSetExtractor, weightMap);
 		this.topCount = topCount;
 	}
 
