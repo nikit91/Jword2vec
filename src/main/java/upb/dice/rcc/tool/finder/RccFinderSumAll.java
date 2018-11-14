@@ -26,34 +26,28 @@ public class RccFinderSumAll extends RccFinder {
 	/**
 	 * @see RccFinder#RccFinder(Word2VecModel, GenWord2VecModel)
 	 */
-	/*public RccFinderSumAll(Word2VecModel genModel, GenWord2VecModel memModel) throws IOException {
-		super(genModel, memModel);
-	}*/
-	
-	/**
-	 * @see RccFinder#RccFinder(Word2VecModel, GenWord2VecModel, PublicationWordSetExtractor)
+	/*
+	 * public RccFinderSumAll(Word2VecModel genModel, GenWord2VecModel memModel)
+	 * throws IOException { super(genModel, memModel); }
 	 */
-	public RccFinderSumAll(Word2VecModel genModel, GenWord2VecModel memModel, PublicationWordSetExtractor wordSetExtractor) throws IOException {
+
+	/**
+	 * @see RccFinder#RccFinder(Word2VecModel, GenWord2VecModel,
+	 *      PublicationWordSetExtractor)
+	 */
+	public RccFinderSumAll(Word2VecModel genModel, GenWord2VecModel memModel,
+			PublicationWordSetExtractor wordSetExtractor) throws IOException {
 		super(genModel, memModel, wordSetExtractor);
 	}
 
 	@Override
 	public RccNounPhraseLabelPair findClosestResearchField(File pubFile) throws IOException {
-		Map<String, List<String>> fldWordsMap = wordSetExtractor.extractPublicationWordSet(pubFile);
-		List<String> wordList = new ArrayList<>();
-		for (List<String> wordEntries : fldWordsMap.values()) {
-			wordList.addAll(wordEntries);
-		}
-		float[] sumVec = RccUtil.getSumVector(wordList, genModel);
-		float[] normSumVec = Word2VecMath.normalize(sumVec);
-		String idStr = memModel.getClosestEntry(normSumVec);
-		Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec, memModel.getW2VMap().get(idStr));
-		RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(pubFile.getName(), idStr, cosSim);
-		return tmpPair;
+		return this.findClosestResearchField(pubFile, this.wordSetExtractor);
 	}
-	
+
 	@Override
-	public RccNounPhraseLabelPair findClosestResearchField(File pubFile, PublicationWordSetExtractor wordSetExtractor) throws IOException {
+	public RccNounPhraseLabelPair findClosestResearchField(File pubFile, PublicationWordSetExtractor wordSetExtractor)
+			throws IOException {
 		Map<String, List<String>> fldWordsMap = wordSetExtractor.extractPublicationWordSet(pubFile);
 		List<String> wordList = new ArrayList<>();
 		for (List<String> wordEntries : fldWordsMap.values()) {
@@ -63,7 +57,7 @@ public class RccFinderSumAll extends RccFinder {
 		float[] normSumVec = Word2VecMath.normalize(sumVec);
 		String idStr = memModel.getClosestEntry(normSumVec);
 		Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec, memModel.getW2VMap().get(idStr));
-		RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(pubFile.getName(), idStr, cosSim);
+		RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(pubFile.getName(), idStr, cosSim, 1);
 		return tmpPair;
 	}
 

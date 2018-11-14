@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.opencsv.CSVReader;
 
 import upb.dice.rcc.tool.finder.RccFinder;
+import upb.dice.rcc.tool.finder.RccFinderSnglrCosSim;
 import upb.dice.rcc.tool.finder.RccFinderTopCosSimSum;
 import upb.dice.rcc.tool.rfld.generator.RsrchFldMdlGnrtrCsv;
 import upb.dice.rcc.tool.rmthd.generator.RsrchMthdMdlGnrtr;
@@ -192,7 +193,10 @@ public class RccMain {
 		rMthdMemModel.process();
 
 		this.rFldFinder = new RccFinderTopCosSimSum(genModel, rFldMemModel, wordSetExtractor);
-		this.rMthdFinder = new RccFinderTopCosSimSum(genModel, rMthdMemModel, wordSetExtractor);
+		// Manual weight map
+		Map<String, Float> weightMap = new HashMap<String, Float>();
+		weightMap.put("methodology", 1.2f);
+		this.rMthdFinder = new RccFinderSnglrCosSim(genModel, rMthdMemModel, wordSetExtractor, weightMap);
 	}
 
 	/**

@@ -144,8 +144,8 @@ public class RccFinderSnglrCosSim extends RccFinder {
 				if (closestWord != null) {
 					Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec,
 							memModel.getW2VMap().get(closestWord));
-					cosSim *= wgth;
-					RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(wordEntry, closestWord, cosSim);
+					// cosSim *= wgth;
+					RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(wordEntry, closestWord, cosSim, wgth);
 					pairList.add(tmpPair);
 				}
 			}

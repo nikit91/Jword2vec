@@ -37,7 +37,8 @@ public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
 	 * @see RccFinderSnglrCosSim#RccFinderSnglrCosSim(Word2VecModel,
 	 *      GenWord2VecModel)
 	 */
-	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel, PublicationWordSetExtractor wordSetExtractor) throws IOException {
+	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel,
+			PublicationWordSetExtractor wordSetExtractor) throws IOException {
 		super(genModel, memModel, wordSetExtractor);
 		this.topCount = TOP_COUNT;
 	}
@@ -46,8 +47,8 @@ public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
 	 * @see RccFinderSnglrCosSim#RccFinderSnglrCosSim(Word2VecModel,
 	 *      GenWord2VecModel, Map)
 	 */
-	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel, PublicationWordSetExtractor wordSetExtractor, Map<String, Float> weightMap)
-			throws IOException {
+	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel,
+			PublicationWordSetExtractor wordSetExtractor, Map<String, Float> weightMap) throws IOException {
 		super(genModel, memModel, wordSetExtractor, weightMap);
 		this.topCount = TOP_COUNT;
 	}
@@ -61,7 +62,8 @@ public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
 	 * @param topCount - {@link #topCount}
 	 * @throws IOException
 	 */
-	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel, PublicationWordSetExtractor wordSetExtractor, int topCount) throws IOException {
+	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel,
+			PublicationWordSetExtractor wordSetExtractor, int topCount) throws IOException {
 		super(genModel, memModel, wordSetExtractor);
 		this.topCount = topCount;
 	}
@@ -77,8 +79,9 @@ public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
 	 * @param weightMap - {@link #weightMap}
 	 * @throws IOException
 	 */
-	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel, PublicationWordSetExtractor wordSetExtractor, int topCount,
-			Map<String, Float> weightMap) throws IOException {
+	public RccFinderTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel,
+			PublicationWordSetExtractor wordSetExtractor, int topCount, Map<String, Float> weightMap)
+			throws IOException {
 		super(genModel, memModel, wordSetExtractor, weightMap);
 		this.topCount = topCount;
 	}
@@ -101,8 +104,8 @@ public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
 				if (closestWord != null) {
 					Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec,
 							memModel.getW2VMap().get(closestWord));
-					cosSim *= wgth;
-					RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(wordEntry, closestWord, cosSim);
+					// cosSim *= wgth;
+					RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(wordEntry, closestWord, cosSim, wgth);
 					pairList.add(tmpPair);
 				}
 			}
@@ -138,7 +141,7 @@ public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
 		float[] normSumVec = Word2VecMath.normalize(sumVec);
 		String closestWord = memModel.getClosestEntry(normSumVec);
 		Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec, memModel.getW2VMap().get(closestWord));
-		resPair = new RccNounPhraseLabelPair(fileLabel, closestWord, cosSim);
+		resPair = new RccNounPhraseLabelPair(fileLabel, closestWord, cosSim, 1);
 		return resPair;
 	}
 

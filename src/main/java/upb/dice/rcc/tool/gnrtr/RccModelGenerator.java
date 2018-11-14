@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.aksw.word2vecrestful.tool.ModelNormalizer;
+import org.aksw.word2vecrestful.utils.TimeLogger;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -24,6 +25,8 @@ import upb.dice.rcc.tool.RccUtil;
  *
  */
 public abstract class RccModelGenerator {
+	
+	public static final TimeLogger TLOG = new TimeLogger();
 
 	public static Logger LOG = LogManager.getLogger(RccModelGenerator.class);
 	/**
@@ -60,9 +63,10 @@ public abstract class RccModelGenerator {
 		// declare the output stream
 		BufferedOutputStream bOutStrm = null;
 		try {
+			TLOG.logTime(1);
 			// read and load the input file onto memory
 			loadWordIdMap(inputFile);
-
+			
 			Integer totWords = wrdsIdMap.size();
 			Integer vecSize = w2vModel.vectorSize;
 			int w = 0;
@@ -104,6 +108,7 @@ public abstract class RccModelGenerator {
 				bOutStrm.close();
 			}
 		}
+		TLOG.printTime(1, "Model Generation");
 
 	}
 

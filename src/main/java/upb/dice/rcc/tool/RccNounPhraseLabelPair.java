@@ -5,12 +5,15 @@ public class RccNounPhraseLabelPair implements Comparable<RccNounPhraseLabelPair
 	private String nounPhrase;
 	private String closestWord;
 	private double cosineSim;
-
-	public RccNounPhraseLabelPair(String nounPhrase, String closestWord, double cosineSim) {
+	private float wgthVal;
+	private double cosineSimWgthd;
+	public RccNounPhraseLabelPair(String nounPhrase, String closestWord, double cosineSim, float wgthVal) {
 		super();
 		this.nounPhrase = nounPhrase;
 		this.closestWord = closestWord;
 		this.cosineSim = cosineSim;
+		this.wgthVal = wgthVal;
+		this.cosineSimWgthd = this.cosineSim*this.wgthVal;
 	}
 
 	public String getNounPhrase() {
@@ -39,13 +42,29 @@ public class RccNounPhraseLabelPair implements Comparable<RccNounPhraseLabelPair
 
 	@Override
 	public String toString() {
-		return "RsrchFldNounPhrsPair [nounPhrase=" + nounPhrase + ", closestWord=" + closestWord + ", cosineSim="
-				+ cosineSim + "]";
+		return "RccNounPhraseLabelPair [nounPhrase=" + nounPhrase + ", closestWord=" + closestWord + ", cosineSim="
+				+ cosineSim + ", wgthVal=" + wgthVal + ", cosineSimWgthd=" + cosineSimWgthd + "]";
+	}
+
+	public float getWgthVal() {
+		return wgthVal;
+	}
+
+	public void setWgthVal(float wgthVal) {
+		this.wgthVal = wgthVal;
+	}
+
+	public double getCosineSimWgthd() {
+		return cosineSimWgthd;
+	}
+
+	public void setCosineSimWgthd(double cosineSimWgthd) {
+		this.cosineSimWgthd = cosineSimWgthd;
 	}
 
 	@Override
 	public int compareTo(RccNounPhraseLabelPair other) {
-		double simDiff = this.cosineSim - other.cosineSim;
+		double simDiff = this.cosineSimWgthd - other.cosineSimWgthd;
 		int retVal = 0;
 		if (simDiff > 0) {
 			retVal = 1;
