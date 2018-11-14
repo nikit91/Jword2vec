@@ -64,7 +64,7 @@ public class PublicationWordSetExtractor {
 	 * @return - set of the all the words in in the publication file
 	 * @throws IOException
 	 */
-	public Map<String, List<String>> extractPublicationWordSet(File inputFile) throws IOException {
+	public synchronized Map<String, List<String>> extractPublicationWordSet(File inputFile) throws IOException {
 		String filePath = inputFile.getAbsolutePath();
 		// init wordset
 		Map<String, List<String>> fldWordsMap = pubCache.get(filePath);

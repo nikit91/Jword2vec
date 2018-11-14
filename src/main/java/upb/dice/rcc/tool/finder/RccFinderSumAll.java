@@ -51,5 +51,20 @@ public class RccFinderSumAll extends RccFinder {
 		RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(pubFile.getName(), idStr, cosSim);
 		return tmpPair;
 	}
+	
+	@Override
+	public RccNounPhraseLabelPair findClosestResearchField(File pubFile, PublicationWordSetExtractor wordSetExtractor) throws IOException {
+		Map<String, List<String>> fldWordsMap = wordSetExtractor.extractPublicationWordSet(pubFile);
+		List<String> wordList = new ArrayList<>();
+		for (List<String> wordEntries : fldWordsMap.values()) {
+			wordList.addAll(wordEntries);
+		}
+		float[] sumVec = RccUtil.getSumVector(wordList, genModel);
+		float[] normSumVec = Word2VecMath.normalize(sumVec);
+		String idStr = memModel.getClosestEntry(normSumVec);
+		Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec, memModel.getW2VMap().get(idStr));
+		RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(pubFile.getName(), idStr, cosSim);
+		return tmpPair;
+	}
 
 }

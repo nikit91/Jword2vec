@@ -15,6 +15,8 @@ import org.aksw.word2vecrestful.word2vec.GenWord2VecModel;
 import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelBinSrch;
 import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -43,6 +45,8 @@ import upb.dice.rcc.tool.rmthd.generator.RsrchMthdMdlGnrtr;
  *
  */
 public class RccMain {
+
+	public static Logger LOG = LogManager.getLogger(RccMain.class);
 
 	public static final TimeLogger TLOG = new TimeLogger();
 
@@ -74,10 +78,18 @@ public class RccMain {
 	protected ArrayNode rFldNodes = new ArrayNode(JSON_NODE_FACTORY);
 	protected ArrayNode rMthdNodes = new ArrayNode(JSON_NODE_FACTORY);
 
-	public RccMain(File rFldInputFile, File rMthdInputFile) throws IOException {
+	// Research field output file
+	protected File rFldOutputFile;
+	// Research method output file
+	protected File rMthdOutputFile;
+
+	public RccMain(File rFldInputFile, File rMthdInputFile, File rFldOutputFile, File rMthdOutputFile)
+			throws IOException {
 		this.initMemModels();
 		this.rFldLblMap = getRfldLblMap(rFldInputFile);
 		this.rMthdLblMap = getRmthdLblMap(rMthdInputFile);
+		this.rFldOutputFile = rFldOutputFile;
+		this.rMthdOutputFile = rMthdOutputFile;
 	}
 
 	/**
@@ -108,16 +120,20 @@ public class RccMain {
 		File rMthdOutputFile = new File(rMthdOutputFilePath);
 		try {
 			// init the main
-			RccMain rccMain = new RccMain(rFldInputFile, rMthdInputFile);
-			TLOG.logTime(1);
-			// fetch closest entries
-			rccMain.fetchClosestEntries(pubDirPath);
-			// write the closest entries to file
-			rccMain.writeClosestEntries(rFldOutputFile, rMthdOutputFile);
-			TLOG.printTime(1, "Total Fetch time (Methods and Fields)");
+			RccMain rccMain = new RccMain(rFldInputFile, rMthdInputFile, rFldOutputFile, rMthdOutputFile);
+			rccMain.processEntries(pubDirPath);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void processEntries(String pubDirPath) throws Exception {
+		TLOG.logTime(1);
+		// fetch closest entries
+		this.fetchClosestEntries(pubDirPath);
+		// write the closest entries to file
+		this.writeClosestEntries(rFldOutputFile, rMthdOutputFile);
+		TLOG.printTime(1, "Total Fetch time (Methods and Fields)");
 	}
 
 	/**
@@ -130,7 +146,7 @@ public class RccMain {
 	 * @throws JsonMappingException
 	 * @throws IOException
 	 */
-	public void writeClosestEntries(File rFldOutputFile, File rMthdOutputFile)
+	protected void writeClosestEntries(File rFldOutputFile, File rMthdOutputFile)
 			throws JsonGenerationException, JsonMappingException, IOException {
 		// write research fields
 		writeJsonToFile(rFldNodes, rFldOutputFile);
@@ -147,7 +163,7 @@ public class RccMain {
 	 * @throws JsonMappingException
 	 * @throws IOException
 	 */
-	private void writeJsonToFile(JsonNode node, File outputFile)
+	protected void writeJsonToFile(JsonNode node, File outputFile)
 			throws JsonGenerationException, JsonMappingException, IOException {
 		// ensure directory creation
 		outputFile.getParentFile().mkdirs();
@@ -246,7 +262,7 @@ public class RccMain {
 	 * @param fileName  - name of the file
 	 * @param labelPair - {@link RccNounPhraseLabelPair} instance
 	 */
-	private void saveRfldEntry(String fileName, RccNounPhraseLabelPair labelPair) {
+	protected void saveRfldEntry(String fileName, RccNounPhraseLabelPair labelPair) {
 		ObjectNode fldNode = getEntryNode(fileName, labelPair, rFldLblMap, "field");
 		rFldNodes.add(fldNode);
 	}
@@ -257,7 +273,7 @@ public class RccMain {
 	 * @param fileName  - name of the file
 	 * @param labelPair - {@link RccNounPhraseLabelPair} instance
 	 */
-	private void saveRmthdEntry(String fileName, RccNounPhraseLabelPair labelPair) {
+	protected void saveRmthdEntry(String fileName, RccNounPhraseLabelPair labelPair) {
 		ObjectNode mthdNode = getEntryNode(fileName, labelPair, rMthdLblMap, "method");
 		rMthdNodes.add(mthdNode);
 	}
@@ -270,7 +286,7 @@ public class RccMain {
 	 * @param idMap     - id to label mapping
 	 * @return - json node enclosing the information passed
 	 */
-	private ObjectNode getEntryNode(String fileName, RccNounPhraseLabelPair labelPair, Map<String, String> idMap,
+	protected ObjectNode getEntryNode(String fileName, RccNounPhraseLabelPair labelPair, Map<String, String> idMap,
 			String prefix) {
 		String id = labelPair.getClosestWord();
 		String fldLabel = idMap.get(id);
@@ -291,7 +307,7 @@ public class RccMain {
 	 * @param pubDirPath - path to the publications directory
 	 * @throws IOException
 	 */
-	public void fetchClosestEntries(String pubDirPath) throws IOException {
+	protected void fetchClosestEntries(String pubDirPath) throws IOException {
 
 		File pubFileDir = new File(pubDirPath);
 		for (final File fileEntry : pubFileDir.listFiles()) {

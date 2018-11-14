@@ -101,6 +101,23 @@ public class RccFinderSnglrCosSim extends RccFinder {
 		RccNounPhraseLabelPair phrsPair = fetchSimilarRsrchFld(fldWordsMap, pubFile.getName());
 		return phrsPair;
 	}
+	
+	/**
+	 * Method to find the closest research field for the given publication
+	 * 
+	 * @param pubFile - file for the given publication
+	 * @return - Noun-Phrase and label pair with highest cosine similarity
+	 * @throws IOException
+	 */
+	public RccNounPhraseLabelPair findClosestResearchField(File pubFile, PublicationWordSetExtractor wordSetExtractor) throws IOException {
+		Map<String, List<String>> fldWordsMap = wordSetExtractor.extractPublicationWordSet(pubFile);
+		List<String> wordList = new ArrayList<>();
+		for (List<String> wordEntries : fldWordsMap.values()) {
+			wordList.addAll(wordEntries);
+		}
+		RccNounPhraseLabelPair phrsPair = fetchSimilarRsrchFld(fldWordsMap, pubFile.getName());
+		return phrsPair;
+	}
 
 	/**
 	 * Method to fetch the noun-phrase and label pair with highest cosine similarity

@@ -68,5 +68,13 @@ public abstract class RccFinder {
 	 * @throws IOException
 	 */
 	abstract public RccNounPhraseLabelPair findClosestResearchField(File pubFile) throws IOException;
+	
+	/**
+	 * Method to find the closest research field for the given publication
+	 * 
+	 * @param pubFile - file for the given publication
+	 * @throws IOException
+	 */
+	abstract public RccNounPhraseLabelPair findClosestResearchField(File pubFile, PublicationWordSetExtractor wordSetExtractor) throws IOException;
 
 }
