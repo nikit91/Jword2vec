@@ -76,7 +76,7 @@ public class PublicationWordSetExtractor {
 				// Read file into a json
 				ObjectNode inpObj = (ObjectNode) RsrchFldMdlGnrtr_OldJson.OBJ_READER.readTree(fin);
 				for (String fld : FLDS_TO_READ) {
-					List<String> wordList = new ArrayList<>();
+					List<String> nounPhraseList = new ArrayList<>();
 					JsonNode entryNode = inpObj.get(fld);
 					if (entryNode == null) {
 						continue;
@@ -86,9 +86,9 @@ public class PublicationWordSetExtractor {
 					while (phraseItr.hasNext()) {
 						JsonNode phraseEntry = phraseItr.next();
 						String line = phraseEntry.asText();
-						wordList.addAll(RccUtil.fetchAllWordTokens(line, w2vModel));
+						nounPhraseList.add(line);
 					}
-					fldWordsMap.put(fld, wordList);
+					fldWordsMap.put(fld, nounPhraseList);
 				}
 				addToCache(filePath, fldWordsMap);
 			} catch (Exception e) {

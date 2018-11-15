@@ -7,6 +7,7 @@ public class RccNounPhraseLabelPair implements Comparable<RccNounPhraseLabelPair
 	private double cosineSim;
 	private float wgthVal;
 	private double cosineSimWgthd;
+	private float[] sumVec;
 	public RccNounPhraseLabelPair(String nounPhrase, String closestWord, double cosineSim, float wgthVal) {
 		super();
 		this.nounPhrase = nounPhrase;
@@ -73,5 +74,15 @@ public class RccNounPhraseLabelPair implements Comparable<RccNounPhraseLabelPair
 		}
 		return retVal;
 	}
+
+	public float[] getSumVec() {
+		return sumVec;
+	}
+
+	public void setSumVec(float[] sumVec) {
+		this.sumVec = sumVec;
+	}
+	
+	
 
 }

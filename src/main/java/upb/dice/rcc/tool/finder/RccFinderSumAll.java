@@ -50,8 +50,10 @@ public class RccFinderSumAll extends RccFinder {
 			throws IOException {
 		Map<String, List<String>> fldWordsMap = wordSetExtractor.extractPublicationWordSet(pubFile);
 		List<String> wordList = new ArrayList<>();
-		for (List<String> wordEntries : fldWordsMap.values()) {
-			wordList.addAll(wordEntries);
+		for (List<String> nounPhraseList : fldWordsMap.values()) {
+			for(String nounPhrase : nounPhraseList) {
+				wordList.addAll(RccUtil.fetchAllWordTokens(nounPhrase, genModel));
+			}
 		}
 		float[] sumVec = RccUtil.getSumVector(wordList, genModel);
 		float[] normSumVec = Word2VecMath.normalize(sumVec);

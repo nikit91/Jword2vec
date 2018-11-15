@@ -95,24 +95,24 @@ public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
 			if (wgth == null) {
 				wgth = 1f;
 			}
-			Set<String> wordSet = new HashSet<>();
-			wordSet.addAll(fldWordsMap.get(fldLabel));
-			for (String wordEntry : wordSet) {
-				float[] sumVec = RccUtil.getSumVector(RccUtil.fetchAllWordTokens(wordEntry, genModel), genModel);
+			Set<String> nounPhraseSet = new HashSet<>();
+			nounPhraseSet.addAll(fldWordsMap.get(fldLabel));
+			for (String nounPhrase : nounPhraseSet) {
+				float[] sumVec = RccUtil.getSumVector(RccUtil.fetchAllWordTokens(nounPhrase, genModel), genModel);
 				float[] normSumVec = Word2VecMath.normalize(sumVec);
 				String closestWord = memModel.getClosestEntry(normSumVec);
 				if (closestWord != null) {
 					Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec,
 							memModel.getW2VMap().get(closestWord));
 					// cosSim *= wgth;
-					RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(wordEntry, closestWord, cosSim, wgth);
+					RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(nounPhrase, closestWord, cosSim, wgth);
+					tmpPair.setSumVec(sumVec);
 					pairList.add(tmpPair);
 				}
 			}
 
 		}
 		Collections.sort(pairList, Collections.reverseOrder());
-		resPair = pairList.get(0);
 		List<RccNounPhraseLabelPair> topPairList = new ArrayList<>();
 		if (pairList.size() > topCount) {
 			topPairList.addAll(pairList.subList(0, topCount));
@@ -133,11 +133,17 @@ public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
 	 */
 	protected RccNounPhraseLabelPair findClosestSumEntry(List<RccNounPhraseLabelPair> topPairList, String fileLabel) {
 		RccNounPhraseLabelPair resPair = null;
-		List<String> wordList = new ArrayList<>();
+		int vecSize = memModel.getVectorSize();
+		float[] sumVec = new float[vecSize];
 		for (RccNounPhraseLabelPair pair : topPairList) {
-			wordList.add(pair.getNounPhrase());
+			float[] curVec = pair.getSumVec();
+			if (curVec != null) {
+				for (int i = 0; i < vecSize; i++) {
+					sumVec[i] += curVec[i];
+				}
+			}
 		}
-		float[] sumVec = RccUtil.getSumVector(wordList, genModel);
+
 		float[] normSumVec = Word2VecMath.normalize(sumVec);
 		String closestWord = memModel.getClosestEntry(normSumVec);
 		Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec, memModel.getW2VMap().get(closestWord));

@@ -135,17 +135,17 @@ public class RccFinderSnglrCosSim extends RccFinder {
 			if (wgth == null) {
 				wgth = 1f;
 			}
-			Set<String> wordSet = new HashSet<>();
-			wordSet.addAll(fldWordsMap.get(fldLabel));
-			for (String wordEntry : wordSet) {
-				float[] sumVec = RccUtil.getSumVector(RccUtil.fetchAllWordTokens(wordEntry, genModel), genModel);
+			Set<String> nounPhraseSet = new HashSet<>();
+			nounPhraseSet.addAll(fldWordsMap.get(fldLabel));
+			for (String nounPhrase : nounPhraseSet) {
+				float[] sumVec = RccUtil.getSumVector(RccUtil.fetchAllWordTokens(nounPhrase, genModel), genModel);
 				float[] normSumVec = Word2VecMath.normalize(sumVec);
 				String closestWord = memModel.getClosestEntry(sumVec);
 				if (closestWord != null) {
 					Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec,
 							memModel.getW2VMap().get(closestWord));
 					// cosSim *= wgth;
-					RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(wordEntry, closestWord, cosSim, wgth);
+					RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(nounPhrase, closestWord, cosSim, wgth);
 					pairList.add(tmpPair);
 				}
 			}
