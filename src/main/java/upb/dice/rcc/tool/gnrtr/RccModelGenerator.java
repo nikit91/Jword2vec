@@ -70,7 +70,7 @@ public abstract class RccModelGenerator {
 			Integer totWords = wrdsIdMap.size();
 			Integer vecSize = w2vModel.vectorSize;
 			int w = 0;
-			LOG.info("Writing " + totWords + " research fields with " + vecSize + " values per vector.");
+			LOG.info("Writing " + totWords + " research entries with " + vecSize + " values per vector.");
 			// initiate the output stream
 			bOutStrm = new BufferedOutputStream(new FileOutputStream(outputFile));
 

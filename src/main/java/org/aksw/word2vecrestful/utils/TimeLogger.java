@@ -16,7 +16,7 @@ public class TimeLogger {
 	
 	public void printTime(int id, String procName) {
 		long diff = System.currentTimeMillis() - strtLog.get(id);
-		LOG.info("Query time recorded for '" + procName + "' is "
+		LOG.info("Time recorded for '" + procName + "' is "
 				+ diff + " milliseconds.");
 	}
 

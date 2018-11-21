@@ -66,7 +66,8 @@ public class RsrchMthdMdlGnrtr extends RccModelGenerator {
 
 	public static Logger LOG = LogManager.getLogger(RsrchMthdMdlGnrtr.class);
 
-	public static final String[] FLDS_TO_READ = { "skos:definition", "skos:prefLabel" };
+	// public static final String[] FLDS_TO_READ = { "skos:definition", "skos:prefLabel", "skos:altLabel" };
+	public static final String[] FLDS_TO_READ = { "skos:prefLabel", "skos:altLabel" };
 	public static final String ID_FLD = "@id";
 	public static final String CNTNT_ARR_FLD = "@graph";
 	public static final String VALUE_FLD = "@value";
@@ -96,14 +97,25 @@ public class RsrchMthdMdlGnrtr extends RccModelGenerator {
 		for (String fld : FLDS_TO_READ) {
 			JsonNode subNode = rsrchMthd.get(fld);
 			if (subNode != null) {
-				String line = subNode.get(VALUE_FLD).asText();
-				wordList.addAll(RccUtil.fetchAllWordTokens(line, w2vModel));
+				if (subNode.isArray()) {
+					Iterator<JsonNode> nodeItr = subNode.iterator();
+					while (nodeItr.hasNext()) {
+						addValTokensToList(nodeItr.next(), wordList);
+					}
+				} else {
+					addValTokensToList(subNode, wordList);
+				}
 			}
 		}
 		if (wordList.size() > 0) {
 			wrdsIdMap.put(rsrchMthd.get(ID_FLD).asText(), wordList);
 		}
 
+	}
+
+	private void addValTokensToList(JsonNode subNode, List<String> tokenList) {
+		String line = subNode.get(VALUE_FLD).asText();
+		tokenList.addAll(RccUtil.fetchAllWordTokens(line, w2vModel));
 	}
 
 	/**
