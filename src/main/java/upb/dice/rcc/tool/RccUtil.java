@@ -6,10 +6,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
@@ -124,7 +124,7 @@ public class RccUtil {
 		List<String> wordList = new ArrayList<>();
 		// check if only one word is present
 		if (line.matches("[\\w\\d]+")) {
-			wordList.add(line);
+			checkAddWord(line, wordList, w2vModel.word2vec);
 		} else {
 			// remove special characters
 			String sanStr = line.replaceAll(ALPHANUMERIC_REGEX, WHITESPACE);
@@ -140,14 +140,16 @@ public class RccUtil {
 				if (wordEntry.matches(JOINEDWORD_REGEX)) {
 					if (w2vModel.word2vec.get(wordEntry) != null) {
 						// put the word in wordset
-						wordList.add(wordEntry);
+						checkAddWord(wordEntry, wordList, w2vModel.word2vec);
 					} else {
 						// split the word and then put it
 						String[] splitWords = wordEntry.split(UNDERSCORE);
-						wordList.addAll(Arrays.asList(splitWords));
+						for(String splitWord : splitWords) {
+							checkAddWord(splitWord, wordList, w2vModel.word2vec);
+						}
 					}
 				} else {
-					wordList.add(wordEntry);
+					checkAddWord(wordEntry, wordList, w2vModel.word2vec);
 				}
 
 			}
@@ -155,6 +157,14 @@ public class RccUtil {
 		// remove stop words
 		wordList.removeAll(stopWords);
 		return wordList;
+	}
+	
+	private static boolean checkAddWord(String word, Collection<String> wordCol, Map<String, float[]> word2Vec) {
+		boolean res = word2Vec.containsKey(word);
+		if(res) {
+			wordCol.add(word);
+		}
+		return res;
 	}
 
 }
