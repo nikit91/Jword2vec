@@ -9,6 +9,8 @@ import java.util.Map;
 import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.aksw.word2vecrestful.word2vec.GenWord2VecModel;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import upb.dice.rcc.tool.PublicationWordSetExtractor;
 import upb.dice.rcc.tool.RccNounPhraseLabelPair;
@@ -23,6 +25,8 @@ import upb.dice.rcc.tool.RccUtil;
  *
  */
 public class RccFinderSumAll extends RccFinder {
+
+	public static Logger LOG = LogManager.getLogger(RccFinderSumAll.class);
 	/**
 	 * @see RccFinder#RccFinder(Word2VecModel, GenWord2VecModel)
 	 */
@@ -51,15 +55,20 @@ public class RccFinderSumAll extends RccFinder {
 		Map<String, List<String>> fldWordsMap = wordSetExtractor.extractPublicationWordSet(pubFile);
 		List<String> wordList = new ArrayList<>();
 		for (List<String> nounPhraseList : fldWordsMap.values()) {
-			for(String nounPhrase : nounPhraseList) {
+			for (String nounPhrase : nounPhraseList) {
 				wordList.addAll(RccUtil.fetchAllWordTokens(nounPhrase, genModel));
 			}
 		}
+		RccNounPhraseLabelPair tmpPair = null;
 		float[] sumVec = RccUtil.getSumVector(wordList, genModel);
-		float[] normSumVec = Word2VecMath.normalize(sumVec);
-		String idStr = memModel.getClosestEntry(normSumVec);
-		Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec, memModel.getW2VMap().get(idStr));
-		RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(pubFile.getName(), idStr, cosSim, 1);
+		if (sumVec != null) {
+			float[] normSumVec = Word2VecMath.normalize(sumVec);
+			String idStr = memModel.getClosestEntry(normSumVec);
+			Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec, memModel.getW2VMap().get(idStr));
+			tmpPair = new RccNounPhraseLabelPair(pubFile.getName(), idStr, cosSim, 1);
+		} else {
+			LOG.info("No sum vector found for the words: " + wordList);
+		}
 		return tmpPair;
 	}
 

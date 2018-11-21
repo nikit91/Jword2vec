@@ -13,6 +13,8 @@ import java.util.Set;
 import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.aksw.word2vecrestful.word2vec.GenWord2VecModel;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import upb.dice.rcc.tool.PublicationWordSetExtractor;
 import upb.dice.rcc.tool.RccNounPhraseLabelPair;
@@ -29,6 +31,8 @@ import upb.dice.rcc.tool.RccUtil;
  *
  */
 public class RccFinderSnglrCosSim extends RccFinder {
+
+	public static Logger LOG = LogManager.getLogger(RccFinderSnglrCosSim.class);
 
 	protected static final Map<String, Float> FIELD_WEIGHT_MAP = new HashMap<String, Float>();
 	static {
@@ -49,10 +53,11 @@ public class RccFinderSnglrCosSim extends RccFinder {
 	 * @param memModel - {@link #memModel}
 	 * @throws IOException
 	 */
-	/*public RccFinderSnglrCosSim(Word2VecModel genModel, GenWord2VecModel memModel) throws IOException {
-		super(genModel, memModel);
-		this.weightMap = FIELD_WEIGHT_MAP;
-	}*/
+	/*
+	 * public RccFinderSnglrCosSim(Word2VecModel genModel, GenWord2VecModel
+	 * memModel) throws IOException { super(genModel, memModel); this.weightMap =
+	 * FIELD_WEIGHT_MAP; }
+	 */
 
 	/**
 	 * Contructor to initialize instance of {@link RccFinderSnglrCosSim} using the
@@ -79,8 +84,8 @@ public class RccFinderSnglrCosSim extends RccFinder {
 	 * @param weightMap - {@link #weightMap}
 	 * @throws IOException
 	 */
-	public RccFinderSnglrCosSim(Word2VecModel genModel, GenWord2VecModel memModel, PublicationWordSetExtractor wordSetExtractor, Map<String, Float> weightMap)
-			throws IOException {
+	public RccFinderSnglrCosSim(Word2VecModel genModel, GenWord2VecModel memModel,
+			PublicationWordSetExtractor wordSetExtractor, Map<String, Float> weightMap) throws IOException {
 		super(genModel, memModel, wordSetExtractor);
 		this.weightMap = weightMap;
 	}
@@ -101,7 +106,7 @@ public class RccFinderSnglrCosSim extends RccFinder {
 		RccNounPhraseLabelPair phrsPair = fetchSimilarRsrchFld(fldWordsMap, pubFile.getName());
 		return phrsPair;
 	}
-	
+
 	/**
 	 * Method to find the closest research field for the given publication
 	 * 
@@ -109,7 +114,8 @@ public class RccFinderSnglrCosSim extends RccFinder {
 	 * @return - Noun-Phrase and label pair with highest cosine similarity
 	 * @throws IOException
 	 */
-	public RccNounPhraseLabelPair findClosestResearchField(File pubFile, PublicationWordSetExtractor wordSetExtractor) throws IOException {
+	public RccNounPhraseLabelPair findClosestResearchField(File pubFile, PublicationWordSetExtractor wordSetExtractor)
+			throws IOException {
 		Map<String, List<String>> fldWordsMap = wordSetExtractor.extractPublicationWordSet(pubFile);
 		List<String> wordList = new ArrayList<>();
 		for (List<String> wordEntries : fldWordsMap.values()) {
@@ -139,14 +145,16 @@ public class RccFinderSnglrCosSim extends RccFinder {
 			nounPhraseSet.addAll(fldWordsMap.get(fldLabel));
 			for (String nounPhrase : nounPhraseSet) {
 				float[] sumVec = RccUtil.getSumVector(RccUtil.fetchAllWordTokens(nounPhrase, genModel), genModel);
-				float[] normSumVec = Word2VecMath.normalize(sumVec);
-				String closestWord = memModel.getClosestEntry(sumVec);
-				if (closestWord != null) {
+				String closestWord = null;
+				if (sumVec != null && (closestWord = memModel.getClosestEntry(sumVec)) != null) {
+					float[] normSumVec = Word2VecMath.normalize(sumVec);
 					Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec,
 							memModel.getW2VMap().get(closestWord));
 					// cosSim *= wgth;
 					RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(nounPhrase, closestWord, cosSim, wgth);
 					pairList.add(tmpPair);
+				} else if (sumVec == null) {
+					LOG.info("No sum vector found for the noun phrase: " + nounPhrase);
 				}
 			}
 

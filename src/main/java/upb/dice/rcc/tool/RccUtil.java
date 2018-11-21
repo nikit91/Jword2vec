@@ -83,15 +83,20 @@ public class RccUtil {
 	 */
 	public static float[] getSumVector(Collection<String> wordCollection, Word2VecModel w2vModel) {
 		float[] finalVec = new float[w2vModel.vectorSize];
+		int validWordCount = 0;
 		for (String wordEntry : wordCollection) {
 			float[] wordVec = w2vModel.word2vec.get(wordEntry);
 			if (wordVec == null) {
 				LOG.info("No vector found for the word: " + wordEntry);
 			} else {
+				validWordCount++;
 				for (int i = 0; i < w2vModel.vectorSize; i++) {
 					finalVec[i] += wordVec[i];
 				}
 			}
+		}
+		if(validWordCount==0) {
+			finalVec = null;
 		}
 		return finalVec;
 	}

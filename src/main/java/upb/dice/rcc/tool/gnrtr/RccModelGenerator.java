@@ -25,7 +25,7 @@ import upb.dice.rcc.tool.RccUtil;
  *
  */
 public abstract class RccModelGenerator {
-	
+
 	public static final TimeLogger TLOG = new TimeLogger();
 
 	public static Logger LOG = LogManager.getLogger(RccModelGenerator.class);
@@ -66,7 +66,7 @@ public abstract class RccModelGenerator {
 			TLOG.logTime(1);
 			// read and load the input file onto memory
 			loadWordIdMap(inputFile);
-			
+
 			Integer totWords = wrdsIdMap.size();
 			Integer vecSize = w2vModel.vectorSize;
 			int w = 0;
@@ -85,20 +85,24 @@ public abstract class RccModelGenerator {
 				List<String> rsrchfldWords = wrdsIdMap.get(rsrchFldId);
 				// calculate the sum vector for the field
 				float[] sumVec = RccUtil.getSumVector(rsrchfldWords, w2vModel);
-				// get the byte array for the normalized sum vector
-				byte[] bSumVec = ModelNormalizer.getNormalizedVecBA(sumVec);
-				// write the research field id
-				bOutStrm.write(rsrchFldId.getBytes(StandardCharsets.UTF_8));
-				// write whitespace
-				bOutStrm.write(ModelNormalizer.WHITESPACE_BA);
-				// write the vector
-				bOutStrm.write(bSumVec);
+				if (sumVec != null) {
+					// get the byte array for the normalized sum vector
+					byte[] bSumVec = ModelNormalizer.getNormalizedVecBA(sumVec);
+					// write the research field id
+					bOutStrm.write(rsrchFldId.getBytes(StandardCharsets.UTF_8));
+					// write whitespace
+					bOutStrm.write(ModelNormalizer.WHITESPACE_BA);
+					// write the vector
+					bOutStrm.write(bSumVec);
 
-				if ((w + 1) % 10000 == 0) {
-					bOutStrm.flush();
-					LOG.info((w + 1) + " Records inserted.");
+					if ((w + 1) % 10000 == 0) {
+						bOutStrm.flush();
+						LOG.info((w + 1) + " Records inserted.");
+					}
+					w++;
+				} else {
+					LOG.info("No sum vector found for: '" + rsrchFldId + "' with words: " + rsrchfldWords);
 				}
-				w++;
 			}
 			// close the output writer
 		} catch (IOException e) {

@@ -11,6 +11,8 @@ import java.util.Set;
 import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.aksw.word2vecrestful.word2vec.GenWord2VecModel;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import upb.dice.rcc.tool.PublicationWordSetExtractor;
 import upb.dice.rcc.tool.RccNounPhraseLabelPair;
@@ -26,6 +28,8 @@ import upb.dice.rcc.tool.RccUtil;
  *
  */
 public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
+
+	public static Logger LOG = LogManager.getLogger(RccFinderTopCosSimSum.class);
 
 	public static final int TOP_COUNT = 10;
 	/**
@@ -99,15 +103,17 @@ public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
 			nounPhraseSet.addAll(fldWordsMap.get(fldLabel));
 			for (String nounPhrase : nounPhraseSet) {
 				float[] sumVec = RccUtil.getSumVector(RccUtil.fetchAllWordTokens(nounPhrase, genModel), genModel);
-				float[] normSumVec = Word2VecMath.normalize(sumVec);
-				String closestWord = memModel.getClosestEntry(normSumVec);
-				if (closestWord != null) {
+				String closestWord = null;
+				if (sumVec != null && (closestWord = memModel.getClosestEntry(sumVec)) != null) {
+					float[] normSumVec = Word2VecMath.normalize(sumVec);
 					Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec,
 							memModel.getW2VMap().get(closestWord));
 					// cosSim *= wgth;
 					RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(nounPhrase, closestWord, cosSim, wgth);
 					tmpPair.setSumVec(sumVec);
 					pairList.add(tmpPair);
+				} else if (sumVec == null) {
+					LOG.info("No sum vector found for the noun phrase: " + nounPhrase);
 				}
 			}
 
