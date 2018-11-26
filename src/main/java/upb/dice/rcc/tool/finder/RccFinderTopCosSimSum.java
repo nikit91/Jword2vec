@@ -106,7 +106,7 @@ public class RccFinderTopCosSimSum extends RccFinderSnglrCosSim {
 				String closestWord = null;
 				if (sumVec != null && (closestWord = memModel.getClosestEntry(sumVec)) != null) {
 					float[] normSumVec = Word2VecMath.normalize(sumVec);
-					Double cosSim = Word2VecMath.cosineSimilarityNormalizedVecs(normSumVec,
+					Double cosSim = Word2VecMath.cosineSimilarity(normSumVec,
 							memModel.getW2VMap().get(closestWord));
 					// cosSim *= wgth;
 					RccNounPhraseLabelPair tmpPair = new RccNounPhraseLabelPair(nounPhrase, closestWord, cosSim, wgth);

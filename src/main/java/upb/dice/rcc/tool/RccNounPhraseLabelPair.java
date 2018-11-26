@@ -12,7 +12,7 @@ public class RccNounPhraseLabelPair implements Comparable<RccNounPhraseLabelPair
 		super();
 		this.nounPhrase = nounPhrase;
 		this.closestWord = closestWord;
-		this.cosineSim = cosineSim;
+		this.cosineSim = cosineSim>1?1.0:cosineSim;
 		this.wgthVal = wgthVal;
 		this.cosineSimWgthd = this.cosineSim*this.wgthVal;
 	}
