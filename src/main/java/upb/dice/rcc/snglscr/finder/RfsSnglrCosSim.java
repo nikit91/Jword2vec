@@ -1,4 +1,4 @@
-package upb.dice.rcc.tool.finder;
+package upb.dice.rcc.snglscr.finder;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +21,7 @@ import upb.dice.rcc.tool.RccNounPhraseLabelPair;
 import upb.dice.rcc.tool.RccUtil;
 
 /**
- * Implementation for {@link RccFinder}. This class finds the closest term for
+ * Implementation for {@link RccFinderSngl}. This class finds the closest term for
  * each noun phrase in the publication and then select the one with highest
  * cosine similarity to its corresponding entry in the custom model. Also, it
  * uses weight map to assign weights to the words from a particular section of
@@ -30,9 +30,9 @@ import upb.dice.rcc.tool.RccUtil;
  * @author nikitsrivastava
  *
  */
-public class RccFinderSnglrCosSim extends RccFinder {
+public class RfsSnglrCosSim extends RccFinderSngl {
 
-	public static Logger LOG = LogManager.getLogger(RccFinderSnglrCosSim.class);
+	public static Logger LOG = LogManager.getLogger(RfsSnglrCosSim.class);
 
 	protected static final Map<String, Float> FIELD_WEIGHT_MAP = new HashMap<String, Float>();
 	static {
@@ -60,7 +60,7 @@ public class RccFinderSnglrCosSim extends RccFinder {
 	 */
 
 	/**
-	 * Contructor to initialize instance of {@link RccFinderSnglrCosSim} using the
+	 * Contructor to initialize instance of {@link RfsSnglrCosSim} using the
 	 * given general Non-Normalized word model and a Word2Vec custom model. The
 	 * weightMap is set as the default {@link FIELD_WEIGHT_MAP}
 	 * 
@@ -69,14 +69,14 @@ public class RccFinderSnglrCosSim extends RccFinder {
 	 * @param wordSetExtractor - {@link #wordSetExtractor}
 	 * @throws IOException
 	 */
-	public RccFinderSnglrCosSim(Word2VecModel genModel, GenWord2VecModel memModel,
+	public RfsSnglrCosSim(Word2VecModel genModel, GenWord2VecModel memModel,
 			PublicationWordSetExtractor wordSetExtractor) throws IOException {
 		super(genModel, memModel, wordSetExtractor);
 		this.weightMap = FIELD_WEIGHT_MAP;
 	}
 
 	/**
-	 * Contructor to initialize instance of {@link RccFinderSnglrCosSim} using the
+	 * Contructor to initialize instance of {@link RfsSnglrCosSim} using the
 	 * given general Normalized word model, a Word2Vec custom model and a WeightMap
 	 * 
 	 * @param genModel  - {@link #genModel}
@@ -84,7 +84,7 @@ public class RccFinderSnglrCosSim extends RccFinder {
 	 * @param weightMap - {@link #weightMap}
 	 * @throws IOException
 	 */
-	public RccFinderSnglrCosSim(Word2VecModel genModel, GenWord2VecModel memModel,
+	public RfsSnglrCosSim(Word2VecModel genModel, GenWord2VecModel memModel,
 			PublicationWordSetExtractor wordSetExtractor, Map<String, Float> weightMap) throws IOException {
 		super(genModel, memModel, wordSetExtractor);
 		this.weightMap = weightMap;

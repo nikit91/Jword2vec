@@ -1,4 +1,4 @@
-package upb.dice.rcc.tool;
+package upb.dice.rcc.multscr.main;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.aksw.word2vecrestful.utils.Cfg;
@@ -32,9 +33,11 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.opencsv.CSVReader;
 
-import upb.dice.rcc.tool.finder.RccFinder;
-import upb.dice.rcc.tool.finder.RccFinderSnglrCosSim;
-import upb.dice.rcc.tool.finder.RccFinderTopCosSimSum;
+import upb.dice.rcc.multscr.finder.RccFinderMult;
+import upb.dice.rcc.multscr.finder.RfmSnglrCosSim;
+import upb.dice.rcc.multscr.finder.RfmTopCosSimSum;
+import upb.dice.rcc.tool.PublicationWordSetExtractor;
+import upb.dice.rcc.tool.RccNounPhraseLabelPair;
 import upb.dice.rcc.tool.rfld.generator.RsrchFldMdlGnrtrCsv;
 import upb.dice.rcc.tool.rmthd.generator.RsrchMthdMdlGnrtr;
 
@@ -45,9 +48,9 @@ import upb.dice.rcc.tool.rmthd.generator.RsrchMthdMdlGnrtr;
  * @author nikitsrivastava
  *
  */
-public class RccMain {
+public class RccMainMultScr {
 
-	public static Logger LOG = LogManager.getLogger(RccMain.class);
+	public static Logger LOG = LogManager.getLogger(RccMainMultScr.class);
 
 	public static final TimeLogger TLOG = new TimeLogger();
 
@@ -73,8 +76,8 @@ public class RccMain {
 	protected Map<String, String> rFldLblMap;
 	protected Map<String, String> rMthdLblMap;
 
-	protected RccFinder rFldFinder;
-	protected RccFinder rMthdFinder;
+	protected RccFinderMult rFldFinder;
+	protected RccFinderMult rMthdFinder;
 
 	protected ArrayNode rFldNodes = new ArrayNode(JSON_NODE_FACTORY);
 	protected ArrayNode rMthdNodes = new ArrayNode(JSON_NODE_FACTORY);
@@ -84,7 +87,7 @@ public class RccMain {
 	// Research method output file
 	protected File rMthdOutputFile;
 
-	public RccMain(File rFldInputFile, File rMthdInputFile, File rFldOutputFile, File rMthdOutputFile)
+	public RccMainMultScr(File rFldInputFile, File rMthdInputFile, File rFldOutputFile, File rMthdOutputFile)
 			throws IOException {
 		this.initMemModels();
 		this.rFldLblMap = getRfldLblMap(rFldInputFile);
@@ -121,7 +124,7 @@ public class RccMain {
 		File rMthdOutputFile = new File(rMthdOutputFilePath);
 		try {
 			// init the main
-			RccMain rccMain = new RccMain(rFldInputFile, rMthdInputFile, rFldOutputFile, rMthdOutputFile);
+			RccMainMultScr rccMain = new RccMainMultScr(rFldInputFile, rMthdInputFile, rFldOutputFile, rMthdOutputFile);
 			rccMain.processEntries(pubDirPath);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -192,11 +195,11 @@ public class RccMain {
 		rMthdMemModel = new W2VNrmlMemModelBinSrch(nrmlRsrchMthdMdl.word2vec, nrmlRsrchMthdMdl.vectorSize);
 		rMthdMemModel.process();
 
-		this.rFldFinder = new RccFinderTopCosSimSum(genModel, rFldMemModel, wordSetExtractor);
+		this.rFldFinder = new RfmTopCosSimSum(genModel, rFldMemModel, wordSetExtractor);
 		// Manual weight map
 		Map<String, Float> weightMap = new HashMap<String, Float>();
 		weightMap.put("methodology", 1.2f);
-		this.rMthdFinder = new RccFinderSnglrCosSim(genModel, rMthdMemModel, wordSetExtractor, weightMap);
+		this.rMthdFinder = new RfmSnglrCosSim(genModel, rMthdMemModel, wordSetExtractor, weightMap);
 	}
 
 	/**
@@ -266,8 +269,8 @@ public class RccMain {
 	 * @param fileName  - name of the file
 	 * @param labelPair - {@link RccNounPhraseLabelPair} instance
 	 */
-	protected void saveRfldEntry(String fileName, RccNounPhraseLabelPair labelPair) {
-		ObjectNode fldNode = getEntryNode(fileName, labelPair, rFldLblMap, "field");
+	protected void saveRfldEntry(String fileName, List<RccNounPhraseLabelPair> labelPairList) {
+		ObjectNode fldNode = getEntryNode(fileName, labelPairList, rFldLblMap, "field");
 		rFldNodes.add(fldNode);
 	}
 
@@ -277,8 +280,8 @@ public class RccMain {
 	 * @param fileName  - name of the file
 	 * @param labelPair - {@link RccNounPhraseLabelPair} instance
 	 */
-	protected void saveRmthdEntry(String fileName, RccNounPhraseLabelPair labelPair) {
-		ObjectNode mthdNode = getEntryNode(fileName, labelPair, rMthdLblMap, "method");
+	protected void saveRmthdEntry(String fileName, List<RccNounPhraseLabelPair> labelPairList) {
+		ObjectNode mthdNode = getEntryNode(fileName, labelPairList, rMthdLblMap, "method");
 		rMthdNodes.add(mthdNode);
 	}
 
@@ -290,18 +293,24 @@ public class RccMain {
 	 * @param idMap     - id to label mapping
 	 * @return - json node enclosing the information passed
 	 */
-	protected ObjectNode getEntryNode(String fileName, RccNounPhraseLabelPair labelPair, Map<String, String> idMap,
-			String prefix) {
-		String id = labelPair.getClosestWord();
-		String fldLabel = idMap.get(id);
-		double score = labelPair.getCosineSim();
+	protected ObjectNode getEntryNode(String fileName, List<RccNounPhraseLabelPair> labelPairList,
+			Map<String, String> idMap, String prefix) {
+		ArrayNode arrayNode = JSON_NODE_FACTORY.arrayNode();
+		ObjectNode entryNode = JSON_NODE_FACTORY.objectNode();
+		for (RccNounPhraseLabelPair labelPair : labelPairList) {
+			String id = labelPair.getClosestWord();
+			String fldLabel = idMap.get(id);
+			double score = labelPair.getCosineSim();
 
-		ObjectNode fldNode = JSON_NODE_FACTORY.objectNode();
-		fldNode.put(prefix + "Id", id);
-		fldNode.put(prefix + "Label", fldLabel);
-		fldNode.put("score", score);
-		fldNode.put("fileName", fileName);
-		return fldNode;
+			ObjectNode fldNode = JSON_NODE_FACTORY.objectNode();
+			fldNode.put(prefix + "Id", id);
+			fldNode.put(prefix + "Label", fldLabel);
+			fldNode.put("score", score);
+			arrayNode.add(fldNode);
+		}
+		entryNode.put("fileName", fileName);
+		entryNode.set("result", arrayNode);
+		return entryNode;
 	}
 
 	/**
@@ -316,9 +325,9 @@ public class RccMain {
 		File pubFileDir = new File(pubDirPath);
 		for (final File fileEntry : pubFileDir.listFiles()) {
 			// Closest Research Field
-			RccNounPhraseLabelPair rFldPair = this.rFldFinder.findClosestResearchField(fileEntry);
+			List<RccNounPhraseLabelPair> rFldPair = this.rFldFinder.findClosestResearchField(fileEntry);
 			// Closest Research Method
-			RccNounPhraseLabelPair rMthdPair = this.rMthdFinder.findClosestResearchField(fileEntry);
+			List<RccNounPhraseLabelPair> rMthdPair = this.rMthdFinder.findClosestResearchField(fileEntry);
 			// Save research field
 			this.saveRfldEntry(fileEntry.getName(), rFldPair);
 			// Save research method

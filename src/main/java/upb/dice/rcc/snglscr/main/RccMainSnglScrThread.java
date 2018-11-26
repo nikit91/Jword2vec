@@ -1,4 +1,4 @@
-package upb.dice.rcc.tool;
+package upb.dice.rcc.snglscr.main;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,7 +10,9 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-import upb.dice.rcc.tool.finder.RccFinder;
+import upb.dice.rcc.snglscr.finder.RccFinderSngl;
+import upb.dice.rcc.tool.PublicationWordSetExtractor;
+import upb.dice.rcc.tool.RccNounPhraseLabelPair;
 
 /**
  * Class to help execute the RccFinder to find research fields and methods for
@@ -19,11 +21,11 @@ import upb.dice.rcc.tool.finder.RccFinder;
  * @author nikitsrivastava
  *
  */
-public class RccMainThread extends RccMain {
+public class RccMainSnglScrThread extends RccMainSnglScr {
 
 	public static final long SLEEP_DURATION = 10000; // 10 seconds
 
-	public RccMainThread(File rFldInputFile, File rMthdInputFile, File rFldOutputFile, File rMthdOutputFile)
+	public RccMainSnglScrThread(File rFldInputFile, File rMthdInputFile, File rFldOutputFile, File rMthdOutputFile)
 			throws IOException {
 		super(rFldInputFile, rMthdInputFile, rFldOutputFile, rMthdOutputFile);
 	}
@@ -56,7 +58,7 @@ public class RccMainThread extends RccMain {
 		File rMthdOutputFile = new File(rMthdOutputFilePath);
 		try {
 			// init the main
-			RccMain rccMain = new RccMainThread(rFldInputFile, rMthdInputFile, rFldOutputFile, rMthdOutputFile);
+			RccMainSnglScr rccMain = new RccMainSnglScrThread(rFldInputFile, rMthdInputFile, rFldOutputFile, rMthdOutputFile);
 			rccMain.processEntries(pubDirPath);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -126,12 +128,12 @@ public class RccMainThread extends RccMain {
 	}
 
 	static class FinderThread implements Runnable {
-		private RccFinder finder;
+		private RccFinderSngl finder;
 		private File fileEntry;
 		private Map<String, RccNounPhraseLabelPair> pairMap;
 		private PublicationWordSetExtractor extractor;
 
-		public FinderThread(RccFinder finder, File fileEntry, Map<String, RccNounPhraseLabelPair> pairMap,
+		public FinderThread(RccFinderSngl finder, File fileEntry, Map<String, RccNounPhraseLabelPair> pairMap,
 				PublicationWordSetExtractor extractor) {
 			super();
 			this.finder = finder;

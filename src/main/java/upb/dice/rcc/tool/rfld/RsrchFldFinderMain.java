@@ -17,9 +17,9 @@ import org.apache.log4j.PropertyConfigurator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import upb.dice.rcc.snglscr.finder.RfsTopCosSimSum;
 import upb.dice.rcc.tool.PublicationWordSetExtractor;
 import upb.dice.rcc.tool.RccNounPhraseLabelPair;
-import upb.dice.rcc.tool.finder.RccFinderTopCosSimSum;
 import upb.dice.rcc.tool.rfld.generator.RsrchFldMdlGnrtrCsv;
 
 /**
@@ -54,7 +54,7 @@ public class RsrchFldFinderMain {
 		// Init wordset extractor
 		PublicationWordSetExtractor wordSetExtractor = new PublicationWordSetExtractor(genModel);
 
-		RccFinderTopCosSimSum finder = new RccFinderTopCosSimSum(genModel, memModel, wordSetExtractor);
+		RfsTopCosSimSum finder = new RfsTopCosSimSum(genModel, memModel, wordSetExtractor);
 
 		String pubFileDirPath = "data/rcc/ext_publications/";
 		File pubFileDir = new File(pubFileDirPath);

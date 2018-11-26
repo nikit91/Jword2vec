@@ -1,4 +1,4 @@
-package upb.dice.rcc.tool.finder;
+package upb.dice.rcc.snglscr.finder;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import upb.dice.rcc.tool.RccNounPhraseLabelPair;
  * @author nikitsrivastava
  *
  */
-public abstract class RccFinder {
+public abstract class RccFinderSngl {
 
 	/**
 	 * WordsetExtractor instance for publications
@@ -46,7 +46,7 @@ public abstract class RccFinder {
 	}*/
 
 	/**
-	 * Contructor to initialize instance of {@link RccFinder} using the given
+	 * Contructor to initialize instance of {@link RccFinderSngl} using the given
 	 * general Normalized word model and a Word2Vec custom model
 	 * 
 	 * @param genModel         - {@link #genModel}
@@ -54,7 +54,7 @@ public abstract class RccFinder {
 	 * @param wordSetExtractor - {@link #wordSetExtractor}
 	 * @throws IOException
 	 */
-	public RccFinder(Word2VecModel genModel, GenWord2VecModel memModel, PublicationWordSetExtractor wordSetExtractor)
+	public RccFinderSngl(Word2VecModel genModel, GenWord2VecModel memModel, PublicationWordSetExtractor wordSetExtractor)
 			throws IOException {
 		this.genModel = genModel;
 		this.memModel = memModel;
