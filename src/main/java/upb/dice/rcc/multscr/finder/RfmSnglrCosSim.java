@@ -159,6 +159,12 @@ public class RfmSnglrCosSim extends RccFinderMult {
 			}
 
 		}
+		resPairList = applyTopFilter(pairList);
+		return resPairList;
+	}
+
+	protected List<RccNounPhraseLabelPair> applyTopFilter(List<RccNounPhraseLabelPair> pairList) {
+		List<RccNounPhraseLabelPair> resPairList = new ArrayList<>();
 		Collections.sort(pairList, Collections.reverseOrder());
 		// top unique logic
 		Set<RccNounPhraseLabelPair> uniqueTopPairs = new TreeSet<>(new RccNplpLabelComparator());
@@ -169,7 +175,6 @@ public class RfmSnglrCosSim extends RccFinderMult {
 				break;
 			}
 		}
-		resPairList = new ArrayList<>();
 		resPairList.addAll(uniqueTopPairs);
 		Collections.sort(resPairList, Collections.reverseOrder());
 		return resPairList;
