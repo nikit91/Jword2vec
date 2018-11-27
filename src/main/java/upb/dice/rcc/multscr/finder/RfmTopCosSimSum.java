@@ -80,7 +80,7 @@ public class RfmTopCosSimSum extends RfmSnglrCosSim {
 	 * @param genModel  - {@link #genModel}
 	 * @param memModel  - {@link #memModel}
 	 * @param topCount  - {@link #topCount}
-	 * @param weightMap - {@link #weightMap}
+	 * @param weightMap - {@link #sectionWeightMap}
 	 * @throws IOException
 	 */
 	public RfmTopCosSimSum(Word2VecModel genModel, GenWord2VecModel memModel,
@@ -95,7 +95,7 @@ public class RfmTopCosSimSum extends RfmSnglrCosSim {
 		List<RccNounPhraseLabelPair> resPairList = null;
 		List<RccNounPhraseLabelPair> pairList = new ArrayList<>();
 		for (String fldLabel : fldWordsMap.keySet()) {
-			Float wgth = weightMap.get(fldLabel);
+			Float wgth = sectionWeightMap.get(fldLabel);
 			if (wgth == null) {
 				wgth = 1f;
 			}

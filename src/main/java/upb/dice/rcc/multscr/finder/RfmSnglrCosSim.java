@@ -36,6 +36,10 @@ public class RfmSnglrCosSim extends RccFinderMult {
 
 	public static Logger LOG = LogManager.getLogger(RfmSnglrCosSim.class);
 
+	public static final int TOP_RES_LENGTH = 1;
+
+	public static final double CSIM_CUTOFF = 0.9d;
+
 	protected static final Map<String, Float> FIELD_WEIGHT_MAP = new HashMap<String, Float>();
 	static {
 		FIELD_WEIGHT_MAP.put("keywords", 1.2f);
@@ -44,7 +48,7 @@ public class RfmSnglrCosSim extends RccFinderMult {
 	 * weight map to assign weights to the words from a particular section of the
 	 * publication
 	 */
-	protected Map<String, Float> weightMap;
+	protected Map<String, Float> sectionWeightMap;
 
 	/**
 	 * Contructor to initialize instance of {@link RccFinderSnglrCosSim} using the
@@ -74,7 +78,7 @@ public class RfmSnglrCosSim extends RccFinderMult {
 	public RfmSnglrCosSim(Word2VecModel genModel, GenWord2VecModel memModel,
 			PublicationWordSetExtractor wordSetExtractor) throws IOException {
 		super(genModel, memModel, wordSetExtractor);
-		this.weightMap = FIELD_WEIGHT_MAP;
+		this.sectionWeightMap = FIELD_WEIGHT_MAP;
 	}
 
 	/**
@@ -83,13 +87,13 @@ public class RfmSnglrCosSim extends RccFinderMult {
 	 * 
 	 * @param genModel  - {@link #genModel}
 	 * @param memModel  - {@link #memModel}
-	 * @param weightMap - {@link #weightMap}
+	 * @param weightMap - {@link #sectionWeightMap}
 	 * @throws IOException
 	 */
 	public RfmSnglrCosSim(Word2VecModel genModel, GenWord2VecModel memModel,
 			PublicationWordSetExtractor wordSetExtractor, Map<String, Float> weightMap) throws IOException {
 		super(genModel, memModel, wordSetExtractor);
-		this.weightMap = weightMap;
+		this.sectionWeightMap = weightMap;
 	}
 
 	/**
@@ -134,7 +138,7 @@ public class RfmSnglrCosSim extends RccFinderMult {
 		List<RccNounPhraseLabelPair> resPairList = null;
 		List<RccNounPhraseLabelPair> pairList = new ArrayList<>();
 		for (String fldLabel : fldWordsMap.keySet()) {
-			Float wgth = weightMap.get(fldLabel);
+			Float wgth = sectionWeightMap.get(fldLabel);
 			if (wgth == null) {
 				wgth = 1f;
 			}
@@ -159,8 +163,9 @@ public class RfmSnglrCosSim extends RccFinderMult {
 		// top unique logic
 		Set<RccNounPhraseLabelPair> uniqueTopPairs = new TreeSet<>(new RccNplpLabelComparator());
 		for (RccNounPhraseLabelPair labelPair : pairList) {
-			uniqueTopPairs.add(labelPair);
-			if (uniqueTopPairs.size() == TOP_RES_LENGTH) {
+			if (labelPair.getCosineSim() > CSIM_CUTOFF || uniqueTopPairs.size() < TOP_RES_LENGTH) {
+				uniqueTopPairs.add(labelPair);
+			} else {
 				break;
 			}
 		}
@@ -172,11 +177,11 @@ public class RfmSnglrCosSim extends RccFinderMult {
 
 	// getter and setter
 	public Map<String, Float> getWeightMap() {
-		return weightMap;
+		return sectionWeightMap;
 	}
 
 	public void setWeightMap(Map<String, Float> weightMap) {
-		this.weightMap = weightMap;
+		this.sectionWeightMap = weightMap;
 	}
 
 }

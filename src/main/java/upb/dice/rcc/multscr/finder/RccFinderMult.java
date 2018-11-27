@@ -31,8 +31,6 @@ public abstract class RccFinderMult {
 	 * Custom Word2Vec Model
 	 */
 	protected GenWord2VecModel memModel;
-	
-	public static final int TOP_RES_LENGTH = 10;
 
 	/**
 	 * Contructor to initialize instance of {@link RccFinder} using the given

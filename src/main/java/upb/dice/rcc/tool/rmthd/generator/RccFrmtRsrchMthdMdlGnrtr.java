@@ -62,9 +62,9 @@ import upb.dice.rcc.tool.gnrtr.RccModelGenerator;
  * @author nikitsrivastava
  *
  */
-public class RsrchMthdMdlGnrtr extends RccModelGenerator {
+public class RccFrmtRsrchMthdMdlGnrtr extends RccModelGenerator {
 
-	public static Logger LOG = LogManager.getLogger(RsrchMthdMdlGnrtr.class);
+	public static Logger LOG = LogManager.getLogger(RccFrmtRsrchMthdMdlGnrtr.class);
 
 	// public static final String[] FLDS_TO_READ = { "skos:definition", "skos:prefLabel", "skos:altLabel" };
 	public static final String[] FLDS_TO_READ = { "skos:prefLabel", "skos:altLabel" };
@@ -79,7 +79,7 @@ public class RsrchMthdMdlGnrtr extends RccModelGenerator {
 	 * @see RccModelGenerator#RccModelGenerator(Word2VecModel)
 	 * @param w2vModel
 	 */
-	public RsrchMthdMdlGnrtr(Word2VecModel w2vModel) {
+	public RccFrmtRsrchMthdMdlGnrtr(Word2VecModel w2vModel) {
 		super(w2vModel);
 	}
 
@@ -155,7 +155,7 @@ public class RsrchMthdMdlGnrtr extends RccModelGenerator {
 		PropertyConfigurator.configure(Cfg.LOG_FILE);
 		// init w2v model
 		Word2VecModel genModel = Word2VecFactory.get();
-		RccModelGenerator generator = new RsrchMthdMdlGnrtr(genModel);
+		RccModelGenerator generator = new RccFrmtRsrchMthdMdlGnrtr(genModel);
 		String inputFilePath = "data/rcc/train_test/sage_research_methods.json";
 		String outputFilePath = Cfg.get("org.aksw.word2vecrestful.word2vec.nrmlrsrchmthdbinmodel.model");
 

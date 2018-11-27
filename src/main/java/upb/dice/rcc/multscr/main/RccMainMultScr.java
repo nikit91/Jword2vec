@@ -39,7 +39,7 @@ import upb.dice.rcc.multscr.finder.RfmTopCosSimSum;
 import upb.dice.rcc.tool.PublicationWordSetExtractor;
 import upb.dice.rcc.tool.RccNounPhraseLabelPair;
 import upb.dice.rcc.tool.rfld.generator.RsrchFldMdlGnrtrCsv;
-import upb.dice.rcc.tool.rmthd.generator.RsrchMthdMdlGnrtr;
+import upb.dice.rcc.tool.rmthd.generator.RccFrmtRsrchMthdMdlGnrtr;
 
 /**
  * Class to help execute the RccFinder to find research fields and methods for
@@ -246,14 +246,14 @@ public class RccMainMultScr {
 			fin = new FileInputStream(inputFile);
 			// Read file into a json
 			ObjectNode inpObj = (ObjectNode) OBJ_READER.readTree(fin);
-			ArrayNode methodArr = (ArrayNode) inpObj.get(RsrchMthdMdlGnrtr.CNTNT_ARR_FLD);
+			ArrayNode methodArr = (ArrayNode) inpObj.get(RccFrmtRsrchMthdMdlGnrtr.CNTNT_ARR_FLD);
 			Iterator<JsonNode> methodItr = methodArr.iterator();
 			while (methodItr.hasNext()) {
 				JsonNode methodEle = methodItr.next();
-				String lineId = methodEle.get(RsrchMthdMdlGnrtr.ID_FLD).asText();
+				String lineId = methodEle.get(RccFrmtRsrchMthdMdlGnrtr.ID_FLD).asText();
 				JsonNode lblNode = methodEle.get(LABEL_FLD);
 				if (lblNode != null) {
-					String lineLbl = lblNode.get(RsrchMthdMdlGnrtr.VALUE_FLD).asText();
+					String lineLbl = lblNode.get(RccFrmtRsrchMthdMdlGnrtr.VALUE_FLD).asText();
 					resMap.put(lineId, lineLbl);
 				}
 			}
