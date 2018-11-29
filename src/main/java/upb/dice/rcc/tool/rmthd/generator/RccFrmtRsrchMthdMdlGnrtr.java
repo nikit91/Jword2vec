@@ -66,8 +66,9 @@ public class RccFrmtRsrchMthdMdlGnrtr extends RccModelGenerator {
 
 	public static Logger LOG = LogManager.getLogger(RccFrmtRsrchMthdMdlGnrtr.class);
 
-	// public static final String[] FLDS_TO_READ = { "skos:definition", "skos:prefLabel", "skos:altLabel" };
-	public static final String[] FLDS_TO_READ = { "skos:prefLabel", "skos:altLabel" };
+	// public static final String[] FLDS_TO_READ = { "skos:definition",
+	// "skos:prefLabel", "skos:altLabel" };
+	public static final String[] FLDS_TO_READ = { "skos:prefLabel", "skos:altLabel", "@nounchunks" };
 	public static final String ID_FLD = "@id";
 	public static final String CNTNT_ARR_FLD = "@graph";
 	public static final String VALUE_FLD = "@value";
@@ -114,7 +115,12 @@ public class RccFrmtRsrchMthdMdlGnrtr extends RccModelGenerator {
 	}
 
 	private void addValTokensToList(JsonNode subNode, List<String> tokenList) {
-		String line = subNode.get(VALUE_FLD).asText();
+		String line = null;
+		if (subNode.isValueNode()) {
+			line = subNode.asText();
+		} else {
+			line = subNode.get(VALUE_FLD).asText();
+		}
 		tokenList.addAll(RccUtil.fetchAllWordTokens(line, w2vModel));
 	}
 
@@ -156,7 +162,8 @@ public class RccFrmtRsrchMthdMdlGnrtr extends RccModelGenerator {
 		// init w2v model
 		Word2VecModel genModel = Word2VecFactory.get();
 		RccModelGenerator generator = new RccFrmtRsrchMthdMdlGnrtr(genModel);
-		String inputFilePath = "data/rcc/train_test/sage_research_methods.json";
+		// String inputFilePath = "data/rcc/train_test/sage_research_methods.json";
+		String inputFilePath = "data/rcc/methods_vocab.json";
 		String outputFilePath = Cfg.get("org.aksw.word2vecrestful.word2vec.nrmlrsrchmthdbinmodel.model");
 
 		File inputFile = new File(inputFilePath);
