@@ -33,7 +33,7 @@ public class RfmSnglrCosSimIdf extends RfmSnglrCosSim {
 	protected Map<String, Double> idfWeightMap;
 	protected double defaultIdfVal;
 	
-	public static final int TOP_RES_LENGTH = 5;
+	public static final int TOP_RES_LENGTH = 1;
 	/**
 	 * Contructor to initialize instance of {@link RfmSnglrCosSim} using the given
 	 * general Normalized word model, a Word2Vec custom model and a WeightMap

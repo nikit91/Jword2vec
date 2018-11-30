@@ -49,43 +49,99 @@ import upb.dice.rcc.tool.rmthd.generator.RccFrmtRsrchMthdMdlGnrtr;
  *
  */
 public class RccMainMultScr {
-
+	/**
+	 * Logger instance
+	 */
 	public static Logger LOG = LogManager.getLogger(RccMainMultScr.class);
-
+	/**
+	 * Time logger instance
+	 */
 	public static final TimeLogger TLOG = new TimeLogger();
-
+	/**
+	 * Index of 'id' field in a research field dataset file
+	 */
 	public static int idIndx = RsrchFldMdlGnrtrCsv.DEFAULT_ID_INDX;
+	/**
+	 * Index of 'label' field in a research field dataset file
+	 */
 	public static int resColIndx = 4;
+	/**
+	 * Label of the container element for Research Method label
+	 */
 	public static final String LABEL_FLD = "skos:prefLabel";
-
+	/**
+	 * Object Mapper Instance for Json
+	 */
 	public static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
+	/**
+	 * Object Reader Instance for Json
+	 */
 	public static final ObjectReader OBJ_READER = OBJ_MAPPER.reader();
+	/**
+	 * Object Writer Instance for Json
+	 */
 	public static final ObjectWriter OBJ_WRITER = OBJ_MAPPER.writer(new DefaultPrettyPrinter());
+	/**
+	 * Node factory Instance for Json
+	 */
 	public static final JsonNodeFactory JSON_NODE_FACTORY = OBJ_MAPPER.getNodeFactory();
 
 	static {
 		// initialize logger
 		PropertyConfigurator.configure(Cfg.LOG_FILE);
 	}
-
+	/**
+	 * Research field in-memory word2vec model
+	 */
 	protected GenWord2VecModel rFldMemModel;
+	/**
+	 * Research method in-memory word2vec model
+	 */
 	protected GenWord2VecModel rMthdMemModel;
+	/**
+	 * General in-memory word2vec model
+	 */
 	protected Word2VecModel genModel;
+	/**
+	 * Publication word set extractor instance
+	 */
 	protected PublicationWordSetExtractor wordSetExtractor;
-
+	/**
+	 * Research field id to label map
+	 */
 	protected Map<String, String> rFldLblMap;
+	/**
+	 * Research method id to label map
+	 */
 	protected Map<String, String> rMthdLblMap;
-
+	/**
+	 * Research field finder instance
+	 */
 	protected RccFinderMult rFldFinder;
+	/**
+	 * Research method finder instance
+	 */
 	protected RccFinderMult rMthdFinder;
-
+	/**
+	 * Intermediate research field results arraynode
+	 */
 	protected ArrayNode rFldNodes = new ArrayNode(JSON_NODE_FACTORY);
+	/**
+	 * Intermediate research method results arraynode
+	 */
 	protected ArrayNode rMthdNodes = new ArrayNode(JSON_NODE_FACTORY);
 
-	// Research field output file
+	/**
+	 * Research field output file
+	 */
 	protected File rFldOutputFile;
-	// Research method output file
+	/**
+	 * Research method output file
+	 */
 	protected File rMthdOutputFile;
+
+	protected RccMainMultScr() {
+	}
 
 	public RccMainMultScr(File rFldInputFile, File rMthdInputFile, File rFldOutputFile, File rMthdOutputFile)
 			throws IOException {
@@ -131,6 +187,13 @@ public class RccMainMultScr {
 		}
 	}
 
+	/**
+	 * Method to process the entries in the given publication folder to identify the
+	 * research methods and research fields
+	 * 
+	 * @param pubDirPath - the given publication files folder
+	 * @throws Exception
+	 */
 	public void processEntries(String pubDirPath) throws Exception {
 		TLOG.logTime(1);
 		// fetch closest entries

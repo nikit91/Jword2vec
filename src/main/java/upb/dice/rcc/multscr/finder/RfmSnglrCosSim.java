@@ -24,7 +24,7 @@ import upb.dice.rcc.tool.RccUtil;
 
 /**
  * Implementation for {@link RccFinderMult}. This class finds the closest term
- * for each noun phrase in the publication and then select the one with highest
+ * for each noun phrase in the publication and then selects the ones with highest
  * cosine similarity to its corresponding entry in the custom model. Also, it
  * uses weight map to assign weights to the words from a particular section of
  * the publication.
@@ -188,5 +188,6 @@ public class RfmSnglrCosSim extends RccFinderMult {
 	public void setWeightMap(Map<String, Float> weightMap) {
 		this.sectionWeightMap = weightMap;
 	}
+	
 
 }
