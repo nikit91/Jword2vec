@@ -26,7 +26,17 @@ import upb.dice.rcc.tool.rmthd.RsrchMthdIdfUtil;
 
 /**
  * Class to help execute the RccFinder to find research fields and methods for
- * the publications in a given directory
+ * the publications in a given directory.
+ * 
+ * It executes a naive research method finder ({@link RfmSnglrCosSim}) run on
+ * the research methods first and then combine the results with the provided
+ * research method results. The combined result is then used to generate IDF
+ * weight map for each research method in the result.
+ * 
+ * After the generation of IDF map, A Top N cosine similarity sum algorithm
+ * ({@link RfmTopCosSimSum}) for Research Fields and a Top IDF weighted singular
+ * cosine similarity algorithm ({@link RfmSnglrCosSimIdf}) is used to identify
+ * Research Fields and Research Methods respectively.
  * 
  * @author nikitsrivastava
  *

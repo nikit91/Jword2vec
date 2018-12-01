@@ -40,7 +40,8 @@ import upb.dice.rcc.tool.gnrtr.RccModelGenerator;
  *    },
  *   "skos:prefLabel": {
  *     "@value": "..."
- *    }
+ *    },
+ *    "@nounchunks": ["...", ...],
  *  },
  *  { ... } ...
  * ]
@@ -57,6 +58,8 @@ import upb.dice.rcc.tool.gnrtr.RccModelGenerator;
  * <dd>container element for the label of the method</dd>
  * <dt>@value</dt>
  * <dd>value of the respective element</dd>
+ * <dt>@nounchunks</dt>
+ * <dd>array of extracted noun chunks from definition</dd>
  * </dl>
  * 
  * @author nikitsrivastava
