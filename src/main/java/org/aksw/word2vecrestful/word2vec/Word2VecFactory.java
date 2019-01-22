@@ -22,6 +22,7 @@ public class Word2VecFactory {
 			.parseBoolean(Cfg.get("org.aksw.word2vecrestful.word2vec.nrmlrsrchfldbinmodel.bin"));
 	
 	private static String nrmlRsrchMthdMdlFilePath = (Cfg.get("org.aksw.word2vecrestful.word2vec.nrmlrsrchmthdbinmodel.model"));
+	private static String nrmlStstclMthdMdlFilePath = (Cfg.get("org.aksw.word2vecrestful.word2vec.nrmlststclmthdbinmodel.model"));
 	private static boolean nrmlRsrchMthdMdlBinFlg = Boolean
 			.parseBoolean(Cfg.get("org.aksw.word2vecrestful.word2vec.nrmlrsrchmthdbinmodel.bin"));
 
@@ -39,5 +40,9 @@ public class Word2VecFactory {
 	
 	public static Word2VecModel getNrmlRsrchMthdModel() {
 		return new Word2VecModelLoader().loadModel(new File(nrmlRsrchMthdMdlFilePath), nrmlRsrchMthdMdlBinFlg);
+	}
+	
+	public static Word2VecModel getNrmlStstclMthdModel() {
+		return new Word2VecModelLoader().loadModel(new File(nrmlStstclMthdMdlFilePath), nrmlRsrchMthdMdlBinFlg);
 	}
 }

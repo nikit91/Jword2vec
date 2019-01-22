@@ -36,7 +36,7 @@ import upb.dice.rcc.tool.gnrtr.RccModelGenerator;
  *  {
  *   "id": "...",
  *   "label": "...",
- *   "nounphrases": ["...", ...]
+ *   "abs_np": ["...", ...]
  *  },
  *  { ... } ...
  * ],
@@ -50,7 +50,7 @@ import upb.dice.rcc.tool.gnrtr.RccModelGenerator;
  * <dd>id of the method</dd>
  * <dt>label</dt>
  * <dd>label of the method</dd>
- * <dt>nounphrases</dt>
+ * <dt>abs_np</dt>
  * <dd>array of all the noun phrases in method's abstract</dd>
  * </dl>
  * 
@@ -63,10 +63,8 @@ public class DbpFrmtRsrchMthdMdlGnrtr extends RccModelGenerator {
 
 	// public static final String[] FLDS_TO_READ = { "skos:definition",
 	// "skos:prefLabel", "skos:altLabel" };
-	public static final String[] FLDS_TO_READ = { "label", "nounphrases" };
+	public static final String[] FLDS_TO_READ = { "label", "abs_np" };
 	public static final String ID_FLD = "id";
-	public static final String CNTNT_ARR_FLD = "@graph";
-	public static final String VALUE_FLD = "@value";
 	public static final String WHITESPACE_REGEX = "\\s";
 	public static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
 	public static final ObjectReader OBJ_READER = OBJ_MAPPER.reader();
@@ -155,8 +153,8 @@ public class DbpFrmtRsrchMthdMdlGnrtr extends RccModelGenerator {
 		// init w2v model
 		Word2VecModel genModel = Word2VecFactory.get();
 		RccModelGenerator generator = new DbpFrmtRsrchMthdMdlGnrtr(genModel);
-		String inputFilePath = "data/rcc/train_test/sage_research_methods.json";
-		String outputFilePath = Cfg.get("org.aksw.word2vecrestful.word2vec.nrmlrsrchmthdbinmodel.model");
+		String inputFilePath = "data/rcc/phase2/vocab/methods/dbpedia_methods_np_vocab.json";
+		String outputFilePath = Cfg.get("org.aksw.word2vecrestful.word2vec.nrmlststclmthdbinmodel.model");
 
 		File inputFile = new File(inputFilePath);
 		File outputFile = new File(outputFilePath);
