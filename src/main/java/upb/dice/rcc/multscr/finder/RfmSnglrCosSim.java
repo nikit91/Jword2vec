@@ -36,9 +36,11 @@ public class RfmSnglrCosSim extends RccFinderMult {
 
 	public static Logger LOG = LogManager.getLogger(RfmSnglrCosSim.class);
 
-	public static final int TOP_RES_LENGTH = 1;
+	public static final int TOP_RES_LENGTH = 10;
 
 	public static final double CSIM_CUTOFF = 0.9d;
+	
+	public static final Float DEF_WGTH = 1f;
 
 	protected static final Map<String, Float> FIELD_WEIGHT_MAP = new HashMap<String, Float>();
 	static {
@@ -140,7 +142,7 @@ public class RfmSnglrCosSim extends RccFinderMult {
 		for (String fldLabel : fldWordsMap.keySet()) {
 			Float wgth = sectionWeightMap.get(fldLabel);
 			if (wgth == null) {
-				wgth = 1f;
+				wgth = DEF_WGTH;
 			}
 			Set<String> nounPhraseSet = new HashSet<>();
 			nounPhraseSet.addAll(fldWordsMap.get(fldLabel));

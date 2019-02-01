@@ -127,7 +127,7 @@ public class RsrchFldMdlGnrtrCsv extends RccModelGenerator {
 		// init w2v model
 		Word2VecModel genModel = Word2VecFactory.get();
 		RsrchFldMdlGnrtrCsv generator = new RsrchFldMdlGnrtrCsv(genModel);
-		String inputFilePath = "data/rcc/train_test/sage_research_fields.csv";
+		String inputFilePath = "data/rcc/phase2/vocab/fields/sage_research_fields_pruned.csv";
 		String outputFilePath = Cfg.get("org.aksw.word2vecrestful.word2vec.nrmlrsrchfldbinmodel.model");
 
 		File inputFile = new File(inputFilePath);

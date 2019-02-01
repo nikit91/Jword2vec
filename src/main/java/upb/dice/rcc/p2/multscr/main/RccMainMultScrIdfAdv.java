@@ -169,11 +169,22 @@ public class RccMainMultScrIdfAdv extends RccMainMultScrIdf {
 		rMthdMemModel.process();
 		// Research field weight map
 		this.rFldSecWgthMap = new HashMap<String, Float>();
+		// TODO remove comment
 		this.rFldSecWgthMap.put("keywords", 1.2f);
-		this.rFldFinder = new RfmTopCosSimSum(genModel, rFldMemModel, wordSetExtractor, this.rFldSecWgthMap);
+		this.rFldSecWgthMap.put("title", 1.2f);
+		//this.rFldSecWgthMap.put("jel_field", 1.2f);
+		this.rFldSecWgthMap.put("methodology", 0f);
+		this.rFldSecWgthMap.put("jel_method", 0f);
+		// TODO Remove comment
+		// this.rFldFinder = new RfmTopCosSimSum(genModel, rFldMemModel, wordSetExtractor, this.rFldSecWgthMap);
+		// TODO comment this
+		this.rFldFinder = new RfmSnglrCosSim(genModel, rFldMemModel, wordSetExtractor, this.rFldSecWgthMap);
 		// Research method weight map
 		this.rMthdSecWgthMap = new HashMap<String, Float>();
 		rMthdSecWgthMap.put("methodology", 1.2f);
+		rMthdSecWgthMap.put("jel_method", 0f);
+		rMthdSecWgthMap.put("jel_field", 0f);
+		rMthdSecWgthMap.put("summary", 0f);
 		// fetch total doc count
 		this.docCount = pubDir.listFiles().length;
 		// this.defaultIdfVal = Math.log(docCount);

@@ -45,7 +45,7 @@ import upb.dice.rcc.tool.rfld.generator.RsrchFldMdlGnrtr_OldJson;
  */
 public class PublicationWordSetExtractor {
 	public static final String[] FLDS_TO_READ = { "abstract", "methodology", "title", "subject", "keywords",
-			"processed_text" };
+			"processed_text", "jel_field", "jel_method", "summary" };
 	RsrchFldMdlGnrtrCsv researchFieldModelGenerator;
 	private Word2VecModel w2vModel;
 
