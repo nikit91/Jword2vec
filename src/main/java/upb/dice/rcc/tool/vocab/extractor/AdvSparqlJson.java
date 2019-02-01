@@ -28,15 +28,22 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
+/**
+ * Utility class to extract labels and descriptions of all the resources from
+ * dbpedia which have the categories in a given list as their subject.
+ * 
+ * @author nikitsrivastava
+ *
+ */
 public class AdvSparqlJson {
-	
+
 	public static final int UNION_SIZE = 50;
-	
+
 	public static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
 	public static final ObjectReader OBJ_READER = OBJ_MAPPER.reader();
 	public static final ObjectWriter OBJ_WRITER = OBJ_MAPPER.writer(new DefaultPrettyPrinter());
 	public static final JsonNodeFactory JSON_NODE_FACTORY = OBJ_MAPPER.getNodeFactory();
-	public static int tempId=1;
+	public static int tempId = 1;
 	public static final StringBuilder QUERY_PREFIX = new StringBuilder();
 	public static final StringBuilder BROADER_QUERY_STR = new StringBuilder();
 	public static final StringBuilder SUBJ_QUERY_STR = new StringBuilder();
@@ -52,7 +59,7 @@ public class AdvSparqlJson {
 	public static final String BROADER_PARAM_STR = " { ?c skos:broader <%s> . } ";
 	public static final String SUBJ_PARAM_STR = " { ?m dct:subject <%s> . } ";
 	public static final String CATEG_FILTER_STR = " FILTER(?c=<%s>) . ";
-	
+
 	static {
 		QUERY_PREFIX.append("PREFIX dbo: <http://dbpedia.org/ontology/> ");
 		QUERY_PREFIX.append("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns/> ");
@@ -75,7 +82,7 @@ public class AdvSparqlJson {
 		SUBJ_QUERY_STR.append(" FILTER langMatches(lang(?about) , 'en') . ");
 		SUBJ_QUERY_STR.append(" FILTER langMatches(lang(?lbl) , 'en') . ");
 		SUBJ_QUERY_STR.append(" } ");
-		
+
 		WHERE_PRT.append(" WHERE { ");
 		UNION_PRT.append(" UNION ");
 		END_PRT.append(" } ");
@@ -90,12 +97,9 @@ public class AdvSparqlJson {
 		METHOD_QUERY_PRT2.append(" FILTER langMatches(lang(?about) , 'en') . ");
 		METHOD_QUERY_PRT2.append(" FILTER langMatches(lang(?lbl) , 'en') . ");
 	}
-	
-	
-	
 
 	public static void main(String[] args) {
-		
+
 		File inputFile = new File(args[0]);
 		File outputFile = new File(args[1]);
 		try {
@@ -109,31 +113,43 @@ public class AdvSparqlJson {
 		}
 
 	}
-
-	public static void process(File inputFile, File outputFile) throws JsonGenerationException, JsonMappingException, IOException {
+	/**
+	 * Method to process the category list in input file and write the results to output file as a json
+	 * @param inputFile - input file containing list of categories
+	 * @param outputFile - output result file to write extracted data in
+	 * @throws JsonGenerationException
+	 * @throws JsonMappingException
+	 * @throws IOException
+	 */
+	public static void process(File inputFile, File outputFile)
+			throws JsonGenerationException, JsonMappingException, IOException {
 		LinkedList<String> linkedList = new LinkedList<>();
 		// Load all categories from file
 		linkedList.addAll(Files.readAllLines(inputFile.toPath()));
-		
+
 		Map<String, List<Methodology>> resMap = new HashMap<String, List<Methodology>>();
 		while (linkedList.size() > 0) {
-			System.out.println("Current Queue size: "+linkedList.size());
+			System.out.println("Current Queue size: " + linkedList.size());
 			String category = linkedList.poll();
-			System.out.println("Current Category: "+category);
+			System.out.println("Current Category: " + category);
 			// generate query to fetch methods
 			String methodQuery = genMethodsQuery(category);
 			fetchAllMethods(executeSparql(methodQuery), resMap);
 			List<Methodology> methodList = resMap.get(category);
-			System.out.println("Current Category's resources size: "+(methodList==null?0:methodList.size()));
+			System.out.println("Current Category's resources size: " + (methodList == null ? 0 : methodList.size()));
 		}
-		
-		System.out.println("Final ResMap Category Size: "+resMap.size());
-		System.out.println("Final ResMap Values Size: "+getValuesSize(resMap.values()));
+
+		System.out.println("Final ResMap Category Size: " + resMap.size());
+		System.out.println("Final ResMap Values Size: " + getValuesSize(resMap.values()));
 		// get json node of map
 		JsonNode jsonNode = generateJsonNode(resMap);
 		writeJsonToFile(jsonNode, outputFile);
 	}
-	
+	/**
+	 * Method to generate a query to fetch methods for a given category
+	 * @param category - category to fetch methods for
+	 * @return generated sparql query
+	 */
 	public static String genMethodsQuery(String category) {
 
 		StringBuilder methodsQuery = new StringBuilder();
@@ -149,7 +165,11 @@ public class AdvSparqlJson {
 		return methodsQuery.toString();
 
 	}
-	
+	/**
+	 * Method to execute a passed query on dbpedia and fetch the results
+	 * @param queryStr - Query to execute
+	 * @return a list of results wrapped in QuerySolution
+	 */
 	public static List<QuerySolution> executeSparql(String queryStr) {
 		ResultSet res = null;
 		List<QuerySolution> querySolutionList = new ArrayList<>();
@@ -160,18 +180,21 @@ public class AdvSparqlJson {
 			((QueryEngineHTTP) qexec).addParam("timeout", "10000");
 			// Execute.
 			res = qexec.execSelect();
-			while(res.hasNext()) {
+			while (res.hasNext()) {
 				querySolutionList.add(res.next());
 			}
 		} catch (Exception e) {
-			System.out.println("Query Failed: "+query);
+			System.out.println("Query Failed: " + query);
 			e.printStackTrace();
 		}
 		// sleep
 		sleep(1000);
 		return querySolutionList;
 	}
-
+	/**
+	 * Method to put the current to sleep for a given amount of milliseconds
+	 * @param ms - time in milliseconds
+	 */
 	public static void sleep(long ms) {
 		try {
 			Thread.sleep(ms);
@@ -179,7 +202,11 @@ public class AdvSparqlJson {
 			e.printStackTrace();
 		}
 	}
-
+	/**
+	 * Method to convert a Map of results to Json
+	 * @param resMap - input map
+	 * @return json object for the given map
+	 */
 	public static JsonNode generateJsonNode(Map<String, List<Methodology>> resMap) {
 		JsonNode jsonNode = OBJ_MAPPER.valueToTree(resMap);
 		return jsonNode;
@@ -200,27 +227,23 @@ public class AdvSparqlJson {
 		outputFile.getParentFile().mkdirs();
 		OBJ_WRITER.writeValue(outputFile, node);
 	}
-	
-	public static List<Methodology> fetchAllMethods(List<QuerySolution> res) {
-		List<Methodology> resList = new ArrayList<>();
-		for (QuerySolution entry : res) {
-			String uri = entry.get("s").toString();
-			String label = entry.get("label").toString();
-			String abs = entry.get("abs").toString();
-			Methodology method = new Methodology(tempId++, uri, label, abs);
-			resList.add(method);
-		}
-		return resList;
-	}
-	
+	/**
+	 * Method to count total number of elements in a collection of type T
+	 * @param col - input collection
+	 * @return count of elements
+	 */
 	public static <T> int getValuesSize(Collection<List<T>> col) {
 		int count = 0;
-		for(Collection<T> inCol : col) {
-			count+=inCol.size();
+		for (Collection<T> inCol : col) {
+			count += inCol.size();
 		}
 		return count;
 	}
-	
+	/**
+	 * Method to extract methodology resources from the resultset and map them against their categories in resmap
+	 * @param res - result set
+	 * @param resMap - map of categories to their methodologies
+	 */
 	public static void fetchAllMethods(List<QuerySolution> res, Map<String, List<Methodology>> resMap) {
 
 		for (QuerySolution entry : res) {

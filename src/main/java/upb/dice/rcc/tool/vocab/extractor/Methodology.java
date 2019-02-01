@@ -1,5 +1,9 @@
 package upb.dice.rcc.tool.vocab.extractor;
-
+/**
+ * Wrapper class for method resources extracted from dbpedia
+ * @author nikitsrivastava
+ *
+ */
 public class Methodology {
 	private int id;
 	private String uri;
