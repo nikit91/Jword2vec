@@ -12,23 +12,23 @@ import org.apache.log4j.Logger;
  * Class to encapsulate word2vec in-memory model and expose methods to perform
  * search on the model. (Only works with Normalized Model)
  * 
- * This class selects {@link W2VNrmlMemModelUnitVec#compareVecCount} vectors
+ * This class selects {@link W2VNrmlMemModelUnitVecExtItr#compareVecCount} vectors
  * (centroids of the KMeans result on the model vectors) and then calculates the
  * cosine similarity of all words in model to those vectors.
  * 
  * It uses the knowledge about pre-processed similarities with
- * {@link W2VNrmlMemModelUnitVec#comparisonVecs} to narrow down the search of
+ * {@link W2VNrmlMemModelUnitVecExtItr#comparisonVecs} to narrow down the search of
  * closest word for the user specified vector.
  * 
  * @author Nikit
  *
  */
-public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
+public class W2VNrmlMemModelUnitVecExtItr extends W2VNrmlMemModelBinSrch {
 	public static Logger LOG = LogManager.getLogger(GenWord2VecModel.class);
 	
 	protected double bucketSize;
 	protected String currentImpl;
-	public W2VNrmlMemModelUnitVec(final Map<String, float[]> word2vec, final int vectorSize, int bucketCount) throws IOException {
+	public W2VNrmlMemModelUnitVecExtItr(final Map<String, float[]> word2vec, final int vectorSize, int bucketCount) throws IOException {
 		super(word2vec, vectorSize, vectorSize, bucketCount);
 		bucketSize = (2d)/(Double.valueOf(bucketCount));
 		currentImpl = "Unit Vector";
@@ -68,6 +68,7 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 			int ringRad = -1;
 			BitSet midBs;
 			//New Addition
+			boolean extraItr = true;
 			while (wordNotFound) {
 				midEmpty = false;
 				ringRad++;
@@ -101,7 +102,10 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 						finBitSet.and(curBs);
 					}
 				}
-				if (!midEmpty) {
+				if(!midEmpty && extraItr) {
+					extraItr = false;
+				}
+				else if (!midEmpty) {
 					int nearbyWordsCount = finBitSet.cardinality();
 					LOG.info("Number of nearby words: " + nearbyWordsCount);
 					int[] nearbyIndexes = new int[nearbyWordsCount];

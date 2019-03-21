@@ -1,13 +1,15 @@
 package org.aksw.word2vecrestful;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.aksw.word2vecrestful.tool.RandomFloatArrayGenerator;
 import org.aksw.word2vecrestful.utils.Cfg;
 import org.aksw.word2vecrestful.word2vec.GenWord2VecModel;
-import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelUnitVec;
 import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelBruteForce;
+import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelUnitVecBeta;
 import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 import org.apache.log4j.LogManager;
@@ -28,7 +30,16 @@ public class NrmlzdThetaMdlPrfmncTester {
 	public static final String[] TEST_WORDS = { "cat", "dog", "airplane", "road", "kennedy", "rome", "human", "disney",
 			"machine", "intelligence", "palaeontology", "surgeon", "amazon", "jesus", "gold", "atlantis", "ronaldo",
 			"pele", "scissors", "lizard" };
-
+	
+	public static float[][] RANDOM_VECTORS = null;
+	
+	static {
+		try {
+		 RANDOM_VECTORS = RandomFloatArrayGenerator.readFromFile(100, 300, new File("testdata/RandomArraysFinal") );
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 	@Test
 	public void testNbmTime() throws IOException {
 		long startTime, diff;
@@ -41,7 +52,7 @@ public class NrmlzdThetaMdlPrfmncTester {
 		List<String> correctWords = getCorrectWords(centroids, nbm);
 		LOG.info("Correct Words are :" + correctWords);
 		LOG.info("Initializing W2VNrmlMemModelUnitVec Model");
-		final GenWord2VecModel memModel = new W2VNrmlMemModelUnitVec(nbm.word2vec, nbm.vectorSize);
+		final GenWord2VecModel memModel = new W2VNrmlMemModelUnitVecBeta(nbm.word2vec, nbm.vectorSize, 50);
 		memModel.process();
 		List<String> lrModelWords = new ArrayList<>();
 

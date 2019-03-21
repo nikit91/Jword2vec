@@ -12,44 +12,54 @@ import org.apache.log4j.Logger;
  * Class to encapsulate word2vec in-memory model and expose methods to perform
  * search on the model. (Only works with Normalized Model)
  * 
- * This class selects {@link W2VNrmlMemModelUnitVec#compareVecCount} vectors
+ * This class selects {@link W2VNrmlMemModelUnitVecBeta#compareVecCount} vectors
  * (centroids of the KMeans result on the model vectors) and then calculates the
  * cosine similarity of all words in model to those vectors.
  * 
  * It uses the knowledge about pre-processed similarities with
- * {@link W2VNrmlMemModelUnitVec#comparisonVecs} to narrow down the search of
+ * {@link W2VNrmlMemModelUnitVecBeta#comparisonVecs} to narrow down the search of
  * closest word for the user specified vector.
  * 
  * @author Nikit
  *
  */
-public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
+public class W2VNrmlMemModelUnitVecBeta extends W2VNrmlMemModelUnitVec {
 	public static Logger LOG = LogManager.getLogger(GenWord2VecModel.class);
+
+	public W2VNrmlMemModelUnitVecBeta(final Map<String, float[]> word2vec, final int vectorSize, int bucketCount) throws IOException {
+		super(word2vec, vectorSize, bucketCount);
+		currentImpl+= " Beta";
+	}
 	
-	protected double bucketSize;
-	protected String currentImpl;
-	public W2VNrmlMemModelUnitVec(final Map<String, float[]> word2vec, final int vectorSize, int bucketCount) throws IOException {
-		super(word2vec, vectorSize, vectorSize, bucketCount);
-		bucketSize = (2d)/(Double.valueOf(bucketCount));
-		currentImpl = "Unit Vector";
+	protected int computeGamma(float[] qVec, int lMult) {
+		//Assuming normalized vector
+		int gamma = 0;
+		double lambda = bucketSize*lMult;
+		float minVal  = Word2VecMath.getMin(qVec);
+		// double alpha = Word2VecMath.norm(qVec);
+		double alpha = 1d;
+		double lSq = lambda*lambda;
+		
+		double a = (lSq*alpha-minVal*minVal);
+		double b = 2*minVal*alpha*(lSq-1);
+		double c = (lSq-1d)*alpha*alpha;
+		
+		double[] betaArr = Word2VecMath.quadraticEquationRoots(a, b, c);
+		
+		double beta = betaArr[0];
+		double delta1 = calcDelta(beta, minVal);
+		beta = betaArr[1];
+		double delta2 = calcDelta(beta, minVal);
+		
+		double delta = Math.abs(delta1>delta2?delta1:delta2);
+		
+		gamma = (int) Math.ceil(delta/bucketSize);
+		return gamma<1?1:gamma;
 	}
-
-	@Override
-	public void process() throws IOException {
-		LOG.info("Process from "+currentImpl+" called");
-		generateComparisonVecs();
-		// Initialize Arrays
-		genAllCosineSim();
+	
+	protected double calcDelta(double beta, double minVal) {
+		return (1d+minVal*beta)/(Math.sqrt(1d+beta*beta+2*minVal*beta));
 	}
-
-	private void generateComparisonVecs() {
-		for (int i = 0; i < vectorSize; i++) {
-			float[] compareVec = new float[vectorSize];
-			compareVec[i] = 1;
-			comparisonVecs[i] = compareVec;
-		}
-	}
-
 	/**
 	 * Method to fetch the closest word entry for a given vector using cosine
 	 * similarity
@@ -63,11 +73,13 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 		try {
 			// Normalize incoming vector
 			vector = Word2VecMath.normalize(vector);
+			int gamma =1;
 			boolean wordNotFound = true;
 			boolean midEmpty;
 			int ringRad = -1;
 			BitSet midBs;
 			//New Addition
+			boolean extraItr = true;
 			while (wordNotFound) {
 				midEmpty = false;
 				ringRad++;
@@ -101,7 +113,13 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 						finBitSet.and(curBs);
 					}
 				}
-				if (!midEmpty) {
+				if(!midEmpty && extraItr) {
+					extraItr = false;
+					gamma = computeGamma(vector, ringRad>1?ringRad:1);
+					// minus one to balance the ++ effect of next iteration
+					ringRad+=gamma-1;
+				}
+				else if (!midEmpty) {
 					int nearbyWordsCount = finBitSet.cardinality();
 					LOG.info("Number of nearby words: " + nearbyWordsCount);
 					int[] nearbyIndexes = new int[nearbyWordsCount];
@@ -125,43 +143,6 @@ public class W2VNrmlMemModelUnitVec extends W2VNrmlMemModelBinSrch {
 		}
 		LOG.info("Closest word found is: " + closestWord);
 		return closestWord;
-	}
-
-	/**
-	 * Method to or with all the bitsets in a given range of a bucket from a given
-	 * offset
-	 * 
-	 * @param bIndx     - index of the bucket in bucket array
-	 * @param range     - range of buckets to or with including both left and right
-	 *                  sides
-	 * @param offset    - offset of buckets , 0 if none
-	 * @param bucketArr - array of buckets
-	 * @param curBs     - bitset to perform or operation on
-	 */
-	protected void orWithNeighbours(int bIndx, int range, int offset, BitSet[] bucketArr, BitSet curBs) {
-		int rNbr = bIndx + offset + 1;
-		int lNbr = bIndx - offset - 1;
-		int contLen = bucketArr.length;
-		int rRangeAdd = rNbr + range;
-		int rLim = rRangeAdd > contLen ? contLen : rRangeAdd; // exclusive
-		int lRangeSub = lNbr - range - 1;
-		int lLim = lRangeSub < 0 ? 0 : lRangeSub; // inclusive
-		BitSet temp;
-		while (true) {
-			if (rNbr < rLim) {
-				temp = bucketArr[rNbr];
-				orOperation(temp, curBs);
-			}
-			if (lNbr >= lLim) {
-				temp = bucketArr[lNbr];
-				orOperation(temp, curBs);
-			}
-			rNbr++;
-			lNbr--;
-			if (rNbr >= rLim && lNbr < lLim) {
-				break;
-			}
-		}
 	}
 
 }
