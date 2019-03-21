@@ -83,7 +83,9 @@ public class W2VNrmlMemModelUnitVecExtItr extends W2VNrmlMemModelBinSrch {
 					int indx = getBucketIndex(cosSimVal);
 					BitSet curBs = new BitSet(word2vec.size());
 					// calculate middle bitset
-					curBs.or(csBucketContainer[i][indx]);
+					if(csBucketContainer[i][indx]!=null) {
+						curBs.or(csBucketContainer[i][indx]);
+					}
 					if (ringRad > 0) {
 						orWithNeighbours(indx, ringRad, 0, csBucketContainer[i], curBs);
 					}

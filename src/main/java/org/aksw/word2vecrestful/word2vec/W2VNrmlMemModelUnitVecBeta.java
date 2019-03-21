@@ -31,10 +31,10 @@ public class W2VNrmlMemModelUnitVecBeta extends W2VNrmlMemModelUnitVec {
 		currentImpl+= " Beta";
 	}
 	
-	protected int computeGamma(float[] qVec, int lMult) {
+	protected int computeGamma(float[] qVec) {
 		//Assuming normalized vector
 		int gamma = 0;
-		double lambda = bucketSize*lMult;
+		double lambda = 1-bucketSize;
 		float minVal  = Word2VecMath.getMin(qVec);
 		// double alpha = Word2VecMath.norm(qVec);
 		double alpha = 1d;
@@ -73,7 +73,7 @@ public class W2VNrmlMemModelUnitVecBeta extends W2VNrmlMemModelUnitVec {
 		try {
 			// Normalize incoming vector
 			vector = Word2VecMath.normalize(vector);
-			int gamma =1;
+			int gamma = computeGamma(vector);
 			boolean wordNotFound = true;
 			boolean midEmpty;
 			int ringRad = -1;
@@ -94,7 +94,9 @@ public class W2VNrmlMemModelUnitVecBeta extends W2VNrmlMemModelUnitVec {
 					int indx = getBucketIndex(cosSimVal);
 					BitSet curBs = new BitSet(word2vec.size());
 					// calculate middle bitset
-					curBs.or(csBucketContainer[i][indx]);
+					if(csBucketContainer[i][indx]!=null) {
+						curBs.or(csBucketContainer[i][indx]);
+					}
 					if (ringRad > 0) {
 						orWithNeighbours(indx, ringRad, 0, csBucketContainer[i], curBs);
 					}
@@ -115,7 +117,6 @@ public class W2VNrmlMemModelUnitVecBeta extends W2VNrmlMemModelUnitVec {
 				}
 				if(!midEmpty && extraItr) {
 					extraItr = false;
-					gamma = computeGamma(vector, ringRad>1?ringRad:1);
 					// minus one to balance the ++ effect of next iteration
 					ringRad+=gamma-1;
 				}
